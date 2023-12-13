@@ -1,0 +1,21 @@
+# Prerequisites
+*.d
+*.bak
+*.TMP
+desktop.ini
+
+# Object files
+#Objects/
+objects
+*.o
+*.ko
+*.obj
+*.crf
+*.dep
+*.sct
+
+# Linker output
+listings
+*.lst
+*.map
+*.exp
