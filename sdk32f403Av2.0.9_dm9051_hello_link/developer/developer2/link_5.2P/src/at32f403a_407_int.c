@@ -24,6 +24,7 @@
 
 /* includes ------------------------------------------------------------------*/
 #include "at32f403a_407_int.h"
+#include "tmr_init.h"
 
 /** @addtogroup AT32F403A_periph_examples
   * @{
@@ -129,6 +130,17 @@ void PendSV_Handler(void)
 void SysTick_Handler(void)
 {
 }
+
+#if 1
+void TMR5_GLOBAL_IRQHandler(void) //Accept TMR5, NOT startup_at32f415.s ; TMR6 (Porting by JJ, as 'TMR6')
+{
+  if(tmr_flag_get(TMR5, TMR_OVF_FLAG) != RESET) //TMR6
+  {
+    time_update(); /* Update the all_local_time by adding SYSTEMTICK_PERIOD_MS each SysTick interrupt */
+    tmr_flag_clear(TMR5, TMR_OVF_FLAG); //TMR6
+  }
+}
+#endif
 
 /**
   * @}
