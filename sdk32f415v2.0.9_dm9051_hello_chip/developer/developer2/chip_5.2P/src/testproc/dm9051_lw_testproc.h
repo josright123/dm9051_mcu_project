@@ -12,7 +12,7 @@ static const uint8_t MACaddr[6] = {0x00, 0x60, 0x6e, 0x00, 0x01, 0x25};
 
 //for 'main'
 void testproc_board_initialize(void);
-void testproc_drv_initialize(void);
+uint16_t testproc_drv_initialize(void);
 void testproc_net_test(void);
 void testproc_run(void);
 

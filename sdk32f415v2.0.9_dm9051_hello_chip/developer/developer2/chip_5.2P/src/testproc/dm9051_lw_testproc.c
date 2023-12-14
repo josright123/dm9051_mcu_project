@@ -309,7 +309,7 @@ bench_receive_period(void) {
 			memset(disp, 0, sizeof(disp));
 			memcpy(disp, zbuff, len - 4); //sizeof(zbuff)
 			printf("%s, recv \"%s\" len %u\r\n", mstep_spi_conf_name(), disp, len - 4); //sizeof(zbuff)
-			dm9051_rxlog_monitor_tx_all(HEAD_SPC, zbuff, len - 4); //function_monitor_rx_all(zbuff, len - 4);
+			dm9051_rxlog_monitor_rx_all(HEAD_SPC, zbuff, len - 4); //function_monitor_rx_all(zbuff, len - 4);
 			//break;
 		}
 	}
@@ -444,7 +444,7 @@ self_receive_period(void) {
 		//len = dm9051_rx(zbuff);
 		//if (len) {
 		//	printf("  %s, recv, len %u\r\n", mstep_spi_conf_name(), len - 4); //sizeof(zbuff)
-		//	dm9051_rxlog_monitor_tx_all(HEAD_SPC, zbuff, len - 4); //function_monitor_rx_all(zbuff, len - 4);
+		//	dm9051_rxlog_monitor_rx_all(HEAD_SPC, zbuff, len - 4); //function_monitor_rx_all(zbuff, len - 4);
 		//	return len;
 		//}
 	}
@@ -469,7 +469,7 @@ printf("[rx_start.e] len = %d\r\n", len);
 	
 	if (len) {
 		printf("  %s, recv, len %u\r\n", mstep_spi_conf_name(), len - 4); //sizeof(zbuff)
-		dm9051_rxlog_monitor_tx_all(HEAD_SPC, zbuff, len - 4); //dm9051_rxlog_monitor_tx_all(zbuff, len - 4);
+		dm9051_rxlog_monitor_rx_all(HEAD_SPC, zbuff, len - 4); //dm9051_rxlog_monitor_tx_all(zbuff, len - 4);
 	}
 	return len;
 }
