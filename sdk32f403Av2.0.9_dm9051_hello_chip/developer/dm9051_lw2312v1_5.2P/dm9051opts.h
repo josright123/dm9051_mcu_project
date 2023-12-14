@@ -54,7 +54,7 @@
 #if DM9051_DEBUG_ENABLE == 0
 //.#define dm9051_log_dump0(prefix_str, tlen, buf, len)
 #define dm9051_txlog_monitor_tx_all( hdspc,   buffer,  len)
-#define dm9051_rxlog_monitor_tx_all( hdspc,   buffer,  len)
+#define dm9051_rxlog_monitor_rx_all( hdspc,   buffer,  len)
 #define dm9051_txlog_disp(buffer,  len)
 #define dm9051_rxlog_arp( payload,  tot_len,  len)
 #define dm9051_rxlog_ack( payload,  tot_len,  result_str)

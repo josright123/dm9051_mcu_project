@@ -499,12 +499,16 @@ void display_verify_chipid(char *str, char *spiname, uint16_t id) {
 	if (id != (DM9051_ID >> 16)) {
 		chipid_on_pin_code_log_err(spiname);
 	#if NON_CHIPID_STOP == 1
+		printf(": test end\r\n");
+		printf(": while(1);\r\n");
 		while(1) ;
 	#endif
 	}
 	#if NON_CHIPID_STOP == 1
 	else {
 		printf("Chip ID CHECK experiment! Succeed OK!!\r\n");
+		printf(": test end\r\n");
+		printf(": while(1);\r\n");
 		while(1) ; //Feature attribute experiment!!
 	}
 	#endif
