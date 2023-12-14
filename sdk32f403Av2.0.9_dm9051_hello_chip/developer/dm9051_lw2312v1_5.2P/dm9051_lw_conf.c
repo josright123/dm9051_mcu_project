@@ -148,7 +148,7 @@ typedef struct {
 	#ifndef AT32F437xx
 	const spi_pack_t spi2_pack_f413 = {
 		//ethernet f413 spi2(crm, gpio)
-		"AT32F413 SPI2 ETHERNET, sck/mi/mo/cs pb13/pb14/pb15/pb12",
+		"AT32F403A SPI2 ETHERNET, sck/mi/mo/cs pb13/pb14/pb15/pb12",
 		{"SPI2", SPI2, CRM_SPI2_PERIPH_CLOCK},
 		{GPIOB, GPIO_PINS_13, CRM_GPIOB_PERIPH_CLOCK, GPIO_MODE_MUX,    GPIO_PINSRC_NULL, GPIO_MUX_NULL},  //ISCK
 		{GPIOB, GPIO_PINS_14, CRM_GPIOB_PERIPH_CLOCK, GPIO_MODE_MUX,	GPIO_PINSRC_NULL, GPIO_MUX_NULL},	//IMISO
@@ -350,7 +350,7 @@ const gp_set_t *common_rst = NULL; //&pb8_rst_gpio_set;
 const static spi_dev_t devconf_XXX = {
 	//ethernet f413
 	//ethernet f413 spi2(crm, gpio)
-	"AT32F413 SPI2 ETHERNET, sck/mi/mo/cs pb13/pb14/pb15/pb12",
+	"AT32F403A SPI2 ETHERNET, sck/mi/mo/cs pb13/pb14/pb15/pb12",
 	{"SPI2", SPI2, CRM_SPI2_PERIPH_CLOCK},
 	{GPIOB, GPIO_PINS_13, CRM_GPIOB_PERIPH_CLOCK, GPIO_MODE_MUX,    GPIO_PINSRC_NULL, GPIO_MUX_NULL},  //ISCK
 	{GPIOB, GPIO_PINS_14, CRM_GPIOB_PERIPH_CLOCK, GPIO_MODE_MUX,	GPIO_PINSRC_NULL, GPIO_MUX_NULL},	//IMISO

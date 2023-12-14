@@ -28,12 +28,12 @@ int in_time_link_up_found(void)
   return 0;
 }
 
-void testproc_drv_initialize(void)
+uint16_t testproc_drv_initialize(void)
 {
+	uint16_t id;
 #if (ETHERNET_COUNT >= 2)
 	//=ethernetif_dm9051_init_dual(MACaddr);
 	int i;
-	//uint16_t id;
 	const uint8_t addr_meanless[6] = { 0 }; //no exactly need.
 
 	for (i = 0; i < ETHERNET_COUNT; i++) { //get_eth_interfaces()
@@ -41,13 +41,13 @@ void testproc_drv_initialize(void)
 		dm9051_poweron_rst();
 		dm_delay_ms(1);
 		//id = 
-		dm9051_init(addr_meanless);
+		id = dm9051_init(addr_meanless);
 		dm9051_board_irq_enable();
 		dm9051_start(addr_meanless);
 		//display_verify_chipid("dm9051_init", mstep_spi_conf_name(), id);
 	}
 	mstep_set_net_index(0);
-	
+	return 0;
 #elif (ETHERNET_COUNT == 1) 
 	//
 	// test init dual only need while only 1 ethernet port exist.
@@ -60,15 +60,12 @@ void testproc_drv_initialize(void)
 	dm_delay_ms(1);
 	//id = 
 	printf("................................ dm9051 init\r\n");
-	dm9051_init(MACaddr);
-	printf("................................ irq enable\r\n");
-	dm9051_board_irq_enable(); //irq
-	printf("................................ dm9051 start\r\n");
-	dm9051_start(MACaddr);
+	id = dm9051_init(MACaddr);
 	test_line7_enter_check_setup = 1;
 	printf("................................ dm9051 start, test_line7_enter_check_setup %d\r\n", test_line7_enter_check_setup);
-	//display_verify_chipid("dm9051_init", mstep_spi_conf_name(), id);
+	//.display_verify_chipid("dm9051_init", mstep_spi_conf_name(), id);
 #endif
+	return id;
 }
 
 void testproc_net_test(void)
@@ -88,11 +85,12 @@ void testproc_net_test(void)
   //save.start
   int i;
   uint8_t rcr, rcrn;
+
   rcr = cspi_read_reg(DM9051_RCR);
   cspi_write_reg(DM9051_RCR, 0x31);
   rcrn = cspi_read_reg(DM9051_RCR);
   printf("\r\n");
-	printf(": .s bench_test rcr %02x to %02x\r\n", rcr, rcrn);
+  printf(": .s bench_test rcr %02x to %02x\r\n", rcr, rcrn);
 
   //only unicast for me is allowed.
   for (i=0; i<8; i++)
@@ -105,6 +103,7 @@ void testproc_net_test(void)
   rcr = cspi_read_reg(DM9051_RCR);
   printf(": .e bench_test rcr %02x to %02x\r\n", rcrn, rcr);
   //restore.done
+
   printf(": test end\r\n");
   //printf(": while(1);\r\n");
 #endif
