@@ -21,7 +21,7 @@
   *
   **************************************************************************
   */
-#include "dm9051_lw.h"
+
 #include "dm9051_lw_conf.h"
 //#include "at32f435_437_board.h"
 //#include "at32f435_437_clock.h"
@@ -47,20 +47,12 @@
   */
 int main(void)
 {
-  uint16_t id;
   system_clock_config();
   at32_board_init();
   uart_print_init(115200);
 
   testproc_board_initialize(); //dm9051_board_initialize
-  id = testproc_drv_initialize();
-	
-  if (id != (DM9051_ID >> 16)) {
-	  printf("Chip ID wrong! Check the device board!\r\n");
-	  printf(": test end\r\n");
-	  printf(": while(1);\r\n");
-	  while(1) ;
-  }
+  testproc_drv_initialize();
   testproc_net_test();
   testproc_run();
 }

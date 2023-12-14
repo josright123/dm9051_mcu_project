@@ -30,7 +30,6 @@ int in_time_link_up_found(void)
 
 uint16_t testproc_drv_initialize(void)
 {
-	uint16_t id;
 #if (ETHERNET_COUNT >= 2)
 	//=ethernetif_dm9051_init_dual(MACaddr);
 	int i;
@@ -41,7 +40,7 @@ uint16_t testproc_drv_initialize(void)
 		dm9051_poweron_rst();
 		dm_delay_ms(1);
 		//id = 
-		id = dm9051_init(addr_meanless);
+		dm9051_init(addr_meanless);
 		dm9051_board_irq_enable();
 		dm9051_start(addr_meanless);
 		//display_verify_chipid("dm9051_init", mstep_spi_conf_name(), id);
@@ -55,12 +54,19 @@ uint16_t testproc_drv_initialize(void)
 	
 	//=test_dm9051_init_dual(MACaddr);
 	//uint16_t id;
+	uint16_t id;
 
 	dm9051_poweron_rst();
 	dm_delay_ms(1);
 	//id = 
 	printf("................................ dm9051 init\r\n");
 	id = dm9051_init(MACaddr);
+	if (id != (DM9051_ID >> 16)) {
+	  printf("Chip ID wrong! Check the device board!\r\n");
+	  printf(": test end\r\n");
+	  printf(": while(1);\r\n");
+	  while(1) ;
+	}
 	test_line7_enter_check_setup = 1;
 	printf("................................ dm9051 start, test_line7_enter_check_setup %d\r\n", test_line7_enter_check_setup);
 	//.display_verify_chipid("dm9051_init", mstep_spi_conf_name(), id);
