@@ -1,0 +1,176 @@
+<mxfile host="Electron" modified="2023-12-17T03:16:47.999Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.1.2 Chrome/114.0.5735.289 Electron/25.9.4 Safari/537.36" etag="M3WNjY0BnAD-p7KsrEWc" version="22.1.2" type="device">
+  <diagram id="--OfDldWvj3_21Q7vEdd" name="threads_support流程圖">
+    <mxGraphModel dx="3847" dy="2542" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="EVQxHW8LQqNHiingWtXp-5" value="testproc_main.c" style="swimlane;childLayout=stackLayout;resizeParent=1;resizeParentMax=0;horizontal=1;startSize=20;horizontalStack=0;html=1;fillColor=#1ba1e2;fontColor=#ffffff;strokeColor=#006EAF;" parent="1" vertex="1">
+          <mxGeometry x="-2170" y="-1589" width="620" height="1520" as="geometry">
+            <mxRectangle x="60" y="110" width="70" height="30" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="oBCozW88RkX-oRMPtv9t-35" value="global" style="swimlane;startSize=20;horizontal=0;html=1;" parent="EVQxHW8LQqNHiingWtXp-5" vertex="1">
+          <mxGeometry y="20" width="620" height="380" as="geometry">
+            <mxRectangle y="20" width="440" height="30" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="oBCozW88RkX-oRMPtv9t-36" value="&lt;div&gt;&lt;span style=&quot;background-color: rgb(204, 255, 255);&quot;&gt;typedef void (*sys_timeout_handler)(void *arg);&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#cc0000&quot;&gt;struct sys_timeo&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#cc0000&quot;&gt;{&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#cc0000&quot;&gt;&amp;nbsp; struct sys_timeo *next;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#cc0000&quot;&gt;&amp;nbsp; uint32_t time;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#cc0000&quot;&gt;&amp;nbsp; uint32_t intvl_msec;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#cc0000&quot;&gt;&amp;nbsp; sys_timeout_handler&amp;nbsp; h;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#cc0000&quot;&gt;&amp;nbsp; void *arg;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#cc0000&quot;&gt;#if 1 //.LWIP_DEBUG_TIMERNAMES&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#cc0000&quot;&gt;&amp;nbsp; const char *handler_name;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#cc0000&quot;&gt;#endif // .LWIP_DEBUG_TIMERNAMES&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#cc0000&quot;&gt;};&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;#define LWIP_MAX_TIMEOUT 0x7fffffff&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;/* Check if timer&#39;s expiry time is greater than time and care about u32_t wraparounds */&lt;/span&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#0000cc&quot;&gt;#define TIME_LESS_THAN(t, compare_to) ((((uint32_t)((t) - (compare_to))) &amp;gt; LWIP_MAX_TIMEOUT) ? 1 : 0)&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;/** The one and only timeout list */&lt;/div&gt;&lt;span style=&quot;background-color: rgb(255, 255, 102);&quot;&gt;static struct sys_timeo *next_timeout = NULL;&amp;nbsp; // Global.&lt;/span&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="oBCozW88RkX-oRMPtv9t-35" vertex="1">
+          <mxGeometry x="20" y="10" width="600" height="300" as="geometry" />
+        </mxCell>
+        <mxCell id="EVQxHW8LQqNHiingWtXp-6" value="run" style="swimlane;startSize=20;horizontal=0;html=1;" parent="EVQxHW8LQqNHiingWtXp-5" vertex="1">
+          <mxGeometry y="400" width="620" height="120" as="geometry">
+            <mxRectangle y="50" width="440" height="30" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="EVQxHW8LQqNHiingWtXp-21" value="&lt;div&gt;void testproc_run(void)&lt;/div&gt;&lt;div&gt;{&lt;/div&gt;&lt;div&gt;&amp;nbsp; &lt;font color=&quot;#0000cc&quot;&gt;netlink_init();&lt;/font&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;&amp;nbsp; while (1)&lt;/div&gt;&lt;div&gt;&amp;nbsp; {&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; threads_support();&lt;/div&gt;&lt;div&gt;&amp;nbsp; }&lt;/div&gt;&lt;div&gt;}&lt;/div&gt;&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="EVQxHW8LQqNHiingWtXp-6" vertex="1">
+          <mxGeometry x="20" y="-10" width="150" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="EVQxHW8LQqNHiingWtXp-7" value="support" style="swimlane;startSize=20;horizontal=0;html=1;" parent="EVQxHW8LQqNHiingWtXp-5" vertex="1">
+          <mxGeometry y="520" width="620" height="80" as="geometry">
+            <mxRectangle y="490" width="620" height="30" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="oBCozW88RkX-oRMPtv9t-1" value="&lt;div&gt;void threads_support(void)&lt;/div&gt;&lt;div&gt;{&lt;/div&gt;&lt;div&gt;&amp;nbsp; sys_check_timeouts();&lt;/div&gt;&lt;div&gt;}&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="EVQxHW8LQqNHiingWtXp-7" vertex="1">
+          <mxGeometry x="20" width="170" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="EVQxHW8LQqNHiingWtXp-15" value="check_timeouts" style="swimlane;startSize=20;horizontal=0;html=1;" parent="EVQxHW8LQqNHiingWtXp-5" vertex="1">
+          <mxGeometry y="600" width="620" height="500" as="geometry">
+            <mxRectangle y="570" width="620" height="30" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="oBCozW88RkX-oRMPtv9t-4" value="&lt;div&gt;void sys_check_timeouts(void)&lt;/div&gt;&lt;div&gt;{&lt;/div&gt;&lt;div&gt;&amp;nbsp; uint32_t now;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;&amp;nbsp; &lt;/span&gt;&lt;span style=&quot;background-color: rgb(234, 107, 102);&quot;&gt;now = sys_now();&lt;/span&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;&amp;nbsp; do&lt;/span&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&amp;nbsp; {&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; &lt;font color=&quot;#cc0000&quot;&gt;struct sys_timeo *tmptimeout;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; &lt;span style=&quot;background-color: rgb(204, 255, 255);&quot;&gt;sys_timeout_handler handler;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; void *arg;&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; &lt;font style=&quot;&quot; color=&quot;#cc0000&quot;&gt;tmptimeout = &lt;span style=&quot;background-color: rgb(255, 255, 102);&quot;&gt;next_timeout&lt;/span&gt;;&lt;/font&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; if (tmptimeout == NULL)&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; {&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; return;&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; }&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;&amp;nbsp; &amp;nbsp; if (&lt;font color=&quot;#0000cc&quot;&gt;TIME_LESS_THAN(now, tmptimeout-&amp;gt;time)&lt;/font&gt;)&lt;/span&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; {&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; return;&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; }&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; /* Timeout has expired */&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; next_timeout = tmptimeout-&amp;gt;next;&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; handler = tmptimeout-&amp;gt;h;&amp;nbsp;&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; arg = tmptimeout-&amp;gt;arg;&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; current_timeout_due_time = tmptimeout-&amp;gt;time;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; memp_free(MEMP_SYS_TIMEOUT, tmptimeout);&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; if (handler != NULL)&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; {&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: rgb(255, 229, 153);&quot;&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; handler(arg);&amp;nbsp; &amp;nbsp; // is phy_link_timer(arg)&lt;/span&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; }&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;&amp;nbsp; &amp;nbsp; /* Repeat until all expired timers have been called */&lt;/span&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&amp;nbsp; } while (1);&lt;/div&gt;&lt;div&gt;}&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="EVQxHW8LQqNHiingWtXp-15" vertex="1">
+          <mxGeometry x="20" width="310" height="490" as="geometry" />
+        </mxCell>
+        <mxCell id="NPQRFd8YleLFNfLJd79X-15" value="3" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fa6800;strokeColor=#C73500;fontColor=#000000;" vertex="1" parent="EVQxHW8LQqNHiingWtXp-15">
+          <mxGeometry x="300" y="199" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="oBCozW88RkX-oRMPtv9t-25" value="phy_link_timer" style="swimlane;startSize=20;horizontal=0;html=1;" parent="EVQxHW8LQqNHiingWtXp-5" vertex="1">
+          <mxGeometry y="1100" width="620" height="420" as="geometry">
+            <mxRectangle y="1160" width="620" height="30" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="oBCozW88RkX-oRMPtv9t-59" value="&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: rgb(255, 229, 153);&quot;&gt;void phy_link_timer(void *arg)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;{&lt;/div&gt;&lt;div&gt;&amp;nbsp; net_t *net = arg;&lt;/div&gt;&lt;div&gt;&amp;nbsp; uint8_t chip_link_up = (dm9051_link_update() &amp;amp; 0x0004) ? 1 : 0;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&amp;nbsp; if (!netif_is_link_up(netflags))&lt;/div&gt;&lt;div&gt;&amp;nbsp; {&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; if (chip_link_up)&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; {&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; net-&amp;gt;link_state = NET_LINK_UP;&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; net-&amp;gt;cbf(net, net-&amp;gt;net_arg, NET_LINK_UP);&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; }&lt;/div&gt;&lt;div&gt;&amp;nbsp; }&lt;/div&gt;&lt;div&gt;&amp;nbsp; else if (netif_is_link_up(netflags))&lt;/div&gt;&lt;div&gt;&amp;nbsp; {&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; if (!chip_link_up)&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; {&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; net-&amp;gt;link_state = NET_LINK_DOWN;&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; net-&amp;gt;cbf(net, net-&amp;gt;net_arg, NET_LINK_DOWN);&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; }&lt;/div&gt;&lt;div&gt;&amp;nbsp; }&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;#if 1&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: rgb(255, 229, 153);&quot;&gt;&amp;nbsp; sys_timeout(MQTT_CLIENT_LINK_TMR_MS, phy_link_timer, net);&lt;/span&gt;&lt;/div&gt;&lt;div&gt;#endif&lt;/div&gt;&lt;div&gt;}&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="oBCozW88RkX-oRMPtv9t-25" vertex="1">
+          <mxGeometry x="20" width="390" height="420" as="geometry" />
+        </mxCell>
+        <mxCell id="NPQRFd8YleLFNfLJd79X-3" value="4" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fa6800;strokeColor=#C73500;fontColor=#000000;" vertex="1" parent="oBCozW88RkX-oRMPtv9t-25">
+          <mxGeometry x="410" y="346" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="oBCozW88RkX-oRMPtv9t-8" value="tmr_init.c" style="swimlane;childLayout=stackLayout;resizeParent=1;resizeParentMax=0;horizontal=1;startSize=20;horizontalStack=0;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="1" vertex="1">
+          <mxGeometry x="-680" y="-720" width="351" height="330" as="geometry">
+            <mxRectangle x="60" y="110" width="70" height="30" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="oBCozW88RkX-oRMPtv9t-9" value="sys_now" style="swimlane;startSize=20;horizontal=0;html=1;" parent="oBCozW88RkX-oRMPtv9t-8" vertex="1">
+          <mxGeometry y="20" width="351" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="oBCozW88RkX-oRMPtv9t-10" value="&lt;div&gt;&lt;span style=&quot;background-color: rgb(234, 107, 102);&quot;&gt;uint32_t lwip_sys_now = 0;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;uint32_t&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: rgb(234, 107, 102);&quot;&gt;sys_now(void)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;{&lt;/div&gt;&lt;div&gt;&amp;nbsp; return lwip_sys_now;&lt;/div&gt;&lt;div&gt;}&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="oBCozW88RkX-oRMPtv9t-9" vertex="1">
+          <mxGeometry x="20" width="170" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="oBCozW88RkX-oRMPtv9t-13" value="time_update" style="swimlane;startSize=20;horizontal=0;html=1;" parent="oBCozW88RkX-oRMPtv9t-8" vertex="1">
+          <mxGeometry y="140" width="351" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="NPQRFd8YleLFNfLJd79X-8" value="&lt;div&gt;&lt;span style=&quot;background-color: rgb(234, 107, 102);&quot;&gt;#define SYSTEMTICK_PERIOD_MS&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;&lt;span style=&quot;white-space: pre;&quot;&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/span&gt;10&lt;/span&gt;&lt;/div&gt;&lt;div&gt;void time_update_support(void)&lt;/div&gt;&lt;div&gt;{&lt;/div&gt;&lt;div&gt;&amp;nbsp;&lt;span style=&quot;background-color: rgb(234, 107, 102);&quot;&gt; lwip_sys_now += SYSTEMTICK_PERIOD_MS;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;}&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: rgb(151, 208, 119);&quot;&gt;void time_update(void)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;{&lt;/div&gt;&lt;div&gt;&amp;nbsp; time_update_support();&lt;/div&gt;&lt;div&gt;}&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="oBCozW88RkX-oRMPtv9t-13">
+          <mxGeometry x="20" width="290" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="oBCozW88RkX-oRMPtv9t-18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=none;startFill=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" edge="1" target="oBCozW88RkX-oRMPtv9t-9">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="-1460" y="-943" />
+              <mxPoint x="-1460" y="-320" />
+              <mxPoint x="-740" y="-320" />
+              <mxPoint x="-740" y="-640" />
+            </Array>
+            <mxPoint x="-1550" y="-943.04" as="sourcePoint" />
+            <mxPoint x="-1450" y="-533" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="gl4QMVNb20nadSJKKBGm-1" value="testproc_main.c" style="swimlane;childLayout=stackLayout;resizeParent=1;resizeParentMax=0;horizontal=1;startSize=20;horizontalStack=0;html=1;fillColor=#1ba1e2;fontColor=#ffffff;strokeColor=#006EAF;" parent="1" vertex="1">
+          <mxGeometry x="-1400" y="-1589" width="620" height="1180" as="geometry">
+            <mxRectangle x="60" y="110" width="70" height="30" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="gl4QMVNb20nadSJKKBGm-8" value="global" style="swimlane;startSize=20;horizontal=0;html=1;" parent="gl4QMVNb20nadSJKKBGm-1" vertex="1">
+          <mxGeometry y="20" width="620" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="gl4QMVNb20nadSJKKBGm-10" value="&lt;span style=&quot;background-color: rgb(255, 229, 153);&quot;&gt;&lt;div&gt;#define MQTT_CLIENT_LINK_TMR_MS 200&lt;br&gt;&lt;/div&gt;&lt;div&gt;typedef enum&lt;/div&gt;&lt;div&gt;{&lt;/div&gt;&lt;div&gt;&amp;nbsp; MEMP_SYS_TIMEOUT,&lt;/div&gt;&lt;div&gt;&amp;nbsp; MEMP_MAX&lt;br&gt;&lt;/div&gt;&lt;div&gt;} memp_t;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;void *memp_malloc(memp_t type);&lt;/div&gt;&lt;div&gt;void memp_free(memp_t type, void *mem);&lt;/div&gt;&lt;br&gt;#define sys_timeout(msecs, handler, arg) &lt;/span&gt;&lt;span style=&quot;background-color: rgb(204, 255, 204);&quot;&gt;sys_timeout_debug(msecs, handler, arg, #handler)&lt;/span&gt;&lt;br&gt;&lt;br&gt;typedef void (*sys_timeout_handler)(void *arg);&lt;br&gt;struct sys_timeo mempfixed_desc_tab; // Global.&lt;span style=&quot;background-color: rgb(204, 255, 255);&quot;&gt;&lt;br&gt;&lt;/span&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="gl4QMVNb20nadSJKKBGm-8" vertex="1">
+          <mxGeometry x="20" width="520" height="210" as="geometry" />
+        </mxCell>
+        <mxCell id="gl4QMVNb20nadSJKKBGm-2" value="netlink_init" style="swimlane;startSize=20;horizontal=0;html=1;" parent="gl4QMVNb20nadSJKKBGm-1" vertex="1">
+          <mxGeometry y="250" width="620" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="gl4QMVNb20nadSJKKBGm-9" value="&lt;div&gt;&lt;font color=&quot;#0000cc&quot;&gt;void netlink_init(void)&lt;/font&gt; // (are to phase-in, NOW start API-skelton.)&lt;/div&gt;&lt;div&gt;{&lt;/div&gt;&lt;div&gt;&amp;nbsp; // net_new_task(&amp;amp;__net_instance, linkup_cb, NULL);&lt;/div&gt;&lt;div&gt;&amp;nbsp; __net_instance.link_state = NET_LINK_DOWN;&lt;/div&gt;&lt;div&gt;&amp;nbsp; __net_instance.cbf = linkup_cb;&lt;/div&gt;&lt;div&gt;&amp;nbsp; __net_instance.net_arg = NULL;&lt;/div&gt;&lt;div&gt;&amp;nbsp; /* Start cyclic link_handle timer */&lt;/div&gt;&lt;div&gt;#if 1&lt;/div&gt;&lt;div&gt;&amp;nbsp; &lt;span style=&quot;background-color: rgb(255, 229, 153);&quot;&gt;sys_timeout(MQTT_CLIENT_LINK_TMR_MS, &lt;/span&gt;&lt;span style=&quot;background-color: rgb(204, 255, 255);&quot;&gt;phy_link_timer&lt;/span&gt;&lt;span style=&quot;background-color: rgb(255, 229, 153);&quot;&gt;, &amp;amp;__net_instance);&lt;/span&gt;&amp;nbsp;&lt;/div&gt;&lt;div&gt;&amp;nbsp; //(no sys_untimeout(), THIS IS FOREEVER LOOP CYCLE, such as &#39;link_handle()&#39;)&lt;/div&gt;&lt;div&gt;#endif&lt;/div&gt;&lt;div&gt;}&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="gl4QMVNb20nadSJKKBGm-2" vertex="1">
+          <mxGeometry x="20" width="470" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="gl4QMVNb20nadSJKKBGm-4" value="sys_timeout_debug" style="swimlane;startSize=20;horizontal=0;html=1;" parent="gl4QMVNb20nadSJKKBGm-1" vertex="1">
+          <mxGeometry y="440" width="620" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="gl4QMVNb20nadSJKKBGm-5" value="&lt;div&gt;&lt;span style=&quot;background-color: rgb(204, 255, 204);&quot;&gt;void sys_timeout_debug(uint32_t msecs, &lt;/span&gt;&lt;span style=&quot;background-color: rgb(204, 255, 255);&quot;&gt;sys_timeout_handler handler&lt;/span&gt;&lt;span style=&quot;background-color: rgb(204, 255, 204);&quot;&gt;, void *arg, const char *handler_name)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;{&lt;/div&gt;&lt;div&gt;&amp;nbsp; static struct sys_timeo *timeo;&lt;/div&gt;&lt;div&gt;&amp;nbsp; uint32_t next_timeout_time;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&amp;nbsp; &lt;font color=&quot;#cc0000&quot;&gt;next_timeout_time = (uint32_t)(sys_now() + msecs);&lt;/font&gt; /* overflow handled by TIME_LESS_THAN macro */&lt;/div&gt;&lt;div&gt;&amp;nbsp; &lt;span style=&quot;background-color: rgb(255, 229, 153);&quot;&gt;timeo = sys_timeout_abs1&lt;/span&gt;(&lt;font color=&quot;#cc0000&quot;&gt;next_timeout_time&lt;/font&gt;, handler, arg, handler_name);&lt;/div&gt;&lt;div&gt;&amp;nbsp; if (timeo)&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; timeo-&amp;gt;intvl_msec = msecs;&lt;/div&gt;&lt;div&gt;}&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="gl4QMVNb20nadSJKKBGm-4" vertex="1">
+          <mxGeometry x="20" width="600" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="EVQxHW8LQqNHiingWtXp-16" value="1" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fa6800;strokeColor=#C73500;fontColor=#000000;" parent="gl4QMVNb20nadSJKKBGm-4" vertex="1">
+          <mxGeometry x="210" y="50" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="gl4QMVNb20nadSJKKBGm-6" value="sys_timeout_abs1" style="swimlane;startSize=20;horizontal=0;html=1;" parent="gl4QMVNb20nadSJKKBGm-1" vertex="1">
+          <mxGeometry y="600" width="620" height="580" as="geometry" />
+        </mxCell>
+        <mxCell id="gl4QMVNb20nadSJKKBGm-7" value="&lt;div&gt;static struct sys_timeo *&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: rgb(255, 229, 153);&quot;&gt;sys_timeout_abs1&lt;/span&gt;(&lt;font color=&quot;#cc0000&quot;&gt;uint32_t abs_time&lt;/font&gt;, sys_timeout_handler handler, void *arg, const char *handler_name)&lt;/div&gt;&lt;div&gt;{&lt;/div&gt;&lt;div&gt;&amp;nbsp; struct sys_timeo *timeout, *t;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&amp;nbsp; timeout = (struct sys_timeo *)memp_malloc(MEMP_SYS_TIMEOUT);&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;&amp;nbsp; timeout-&amp;gt;next = NULL;&lt;/span&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&amp;nbsp; timeout-&amp;gt;h = handler;&lt;/div&gt;&lt;div&gt;&amp;nbsp; timeout-&amp;gt;arg = arg;&lt;/div&gt;&lt;div&gt;&amp;nbsp; timeout-&amp;gt;time = &lt;font color=&quot;#cc0000&quot;&gt;abs_time&lt;/font&gt;;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;#if 1 //.LWIP_DEBUG_TIMERNAMES&lt;/div&gt;&lt;div&gt;&amp;nbsp; timeout-&amp;gt;handler_name = handler_name;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;#endif //.LWIP_DEBUG_TIMERNAMES&lt;/span&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&amp;nbsp; if (next_timeout == NULL)&lt;/div&gt;&lt;div&gt;&amp;nbsp; {&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: rgb(255, 255, 0);&quot;&gt;&amp;nbsp; &amp;nbsp; next_timeout = timeout;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; return timeout;&lt;/div&gt;&lt;div&gt;&amp;nbsp; }&lt;/div&gt;&lt;div&gt;&amp;nbsp; if (TIME_LESS_THAN(timeout-&amp;gt;time, next_timeout-&amp;gt;time))&lt;/div&gt;&lt;div&gt;&amp;nbsp; {&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; timeout-&amp;gt;next = next_timeout;&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; next_timeout = timeout;&lt;/div&gt;&lt;div&gt;&amp;nbsp; }&lt;/div&gt;&lt;div&gt;&amp;nbsp; else&lt;/div&gt;&lt;div&gt;&amp;nbsp; {&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; for (t = next_timeout; t != NULL; t = t-&amp;gt;next)&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; {&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; if ((t-&amp;gt;next == NULL) || TIME_LESS_THAN(timeout-&amp;gt;time, t-&amp;gt;next-&amp;gt;time))&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; {&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; timeout-&amp;gt;next = t-&amp;gt;next;&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; t-&amp;gt;next = timeout;&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; break;&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; }&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; }&lt;/div&gt;&lt;div&gt;&amp;nbsp; }&lt;/div&gt;&lt;div&gt;&amp;nbsp; return timeout;&lt;/div&gt;&lt;div&gt;}&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="gl4QMVNb20nadSJKKBGm-6" vertex="1">
+          <mxGeometry x="20" width="580" height="570" as="geometry" />
+        </mxCell>
+        <mxCell id="EVQxHW8LQqNHiingWtXp-14" value="2" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fa6800;strokeColor=#C73500;fontColor=#000000;" parent="gl4QMVNb20nadSJKKBGm-6" vertex="1">
+          <mxGeometry x="190" y="119" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="gl4QMVNb20nadSJKKBGm-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=-0.001;entryY=0.09;entryDx=0;entryDy=0;entryPerimeter=0;exitX=1;exitY=0.25;exitDx=0;exitDy=0;" parent="1" source="EVQxHW8LQqNHiingWtXp-6" target="gl4QMVNb20nadSJKKBGm-2" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-1510" y="-1163" as="sourcePoint" />
+            <mxPoint x="-1410" y="-1044.95" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="-1550" y="-1163" />
+              <mxPoint x="-1470" y="-1163" />
+              <mxPoint x="-1470" y="-1322" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NPQRFd8YleLFNfLJd79X-4" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="-2260" y="-1183" as="sourcePoint" />
+            <mxPoint x="-2170" y="-1183" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NPQRFd8YleLFNfLJd79X-5" value="&lt;font style=&quot;font-size: 24px;&quot;&gt;Start&lt;/font&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="NPQRFd8YleLFNfLJd79X-4">
+          <mxGeometry x="-0.325" y="2" relative="1" as="geometry">
+            <mxPoint x="9" y="-14" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NPQRFd8YleLFNfLJd79X-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" edge="1" parent="1" source="oBCozW88RkX-oRMPtv9t-25" target="gl4QMVNb20nadSJKKBGm-4">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="-1500" y="-123" />
+              <mxPoint x="-1500" y="-1110" />
+              <mxPoint x="-1400" y="-1110" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NPQRFd8YleLFNfLJd79X-9" value="at32f403a_407_int.c" style="swimlane;childLayout=stackLayout;resizeParent=1;resizeParentMax=0;horizontal=1;startSize=20;horizontalStack=0;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="-680" y="-280" width="550" height="220" as="geometry">
+            <mxRectangle x="60" y="110" width="70" height="30" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NPQRFd8YleLFNfLJd79X-10" value="TMR5_GLOBAL_IRQHandler" style="swimlane;startSize=20;horizontal=0;html=1;" vertex="1" parent="NPQRFd8YleLFNfLJd79X-9">
+          <mxGeometry y="20" width="550" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="NPQRFd8YleLFNfLJd79X-11" value="&lt;div&gt;//Accept TMR5, NOT startup_at32f415.s ; TMR6 (Porting by JJ, as &#39;TMR6&#39;)&lt;br&gt;&lt;/div&gt;&lt;div&gt;void TMR5_GLOBAL_IRQHandler(void)&amp;nbsp;&lt;/div&gt;&lt;div&gt;{&lt;/div&gt;&lt;div&gt;&amp;nbsp; if(tmr_flag_get(TMR5, TMR_OVF_FLAG) != RESET) //TMR6&lt;/div&gt;&lt;div&gt;&amp;nbsp; {&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; /* Update the all_local_time by adding SYSTEMTICK_PERIOD_MS each SysTick interrupt */&lt;br&gt;&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; &lt;span style=&quot;background-color: rgb(151, 208, 119);&quot;&gt;time_update();&lt;/span&gt;&amp;nbsp;&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; tmr_flag_clear(TMR5, TMR_OVF_FLAG); //TMR6&lt;/div&gt;&lt;div&gt;&amp;nbsp; }&lt;/div&gt;&lt;div&gt;}&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="NPQRFd8YleLFNfLJd79X-10">
+          <mxGeometry x="20" y="10" width="530" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="NPQRFd8YleLFNfLJd79X-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" target="oBCozW88RkX-oRMPtv9t-13">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-680" y="-150" as="sourcePoint" />
+            <Array as="points">
+              <mxPoint x="-710" y="-150" />
+              <mxPoint x="-710" y="-485" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
