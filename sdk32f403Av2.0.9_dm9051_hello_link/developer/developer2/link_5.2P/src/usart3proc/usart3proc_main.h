@@ -7,7 +7,7 @@
 
 
 //for 'main'
-void usart_configuration(void);
+void usart3_configuration(void);
 int usart3proc_main(void);
 
 #ifdef __cplusplus

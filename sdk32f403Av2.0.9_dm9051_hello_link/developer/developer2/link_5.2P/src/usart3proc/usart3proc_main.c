@@ -53,7 +53,7 @@ uint8_t usart3_tx_buffer_size = USART3_TX_BUFFER_SIZE;
   * @param  none
   * @retval none
   */
-void usart_configuration(void)
+void usart3_configuration(void)
 {
   gpio_init_type gpio_init_struct;
 
@@ -92,9 +92,9 @@ void usart_configuration(void)
   gpio_init(GPIOB, &gpio_init_struct);
 
   /* config usart nvic interrupt */
-  nvic_priority_group_config(NVIC_PRIORITY_GROUP_4);
-  nvic_irq_enable(USART2_IRQn, 0, 0);
-  nvic_irq_enable(USART3_IRQn, 0, 0);
+//  nvic_priority_group_config(NVIC_PRIORITY_GROUP_4);
+//  nvic_irq_enable(USART2_IRQn, 0, 0);
+//  nvic_irq_enable(USART3_IRQn, 0, 0);
 
   /* configure usart2 param */
   usart_init(USART2, 115200, USART_DATA_8BITS, USART_STOP_1_BIT);
@@ -107,14 +107,14 @@ void usart_configuration(void)
   usart_receiver_enable(USART3, TRUE);
 
   /* enable usart2 and usart3 interrupt */
-  usart_interrupt_enable(USART2, USART_RDBF_INT, TRUE);
+//  usart_interrupt_enable(USART2, USART_RDBF_INT, TRUE);
   usart_enable(USART2, TRUE);
 
-  usart_interrupt_enable(USART3, USART_RDBF_INT, TRUE);
+//  usart_interrupt_enable(USART3, USART_RDBF_INT, TRUE);
   usart_enable(USART3, TRUE);
 
-  usart_interrupt_enable(USART2, USART_TDBE_INT, TRUE);
-  usart_interrupt_enable(USART3, USART_TDBE_INT, TRUE);
+//  usart_interrupt_enable(USART2, USART_TDBE_INT, TRUE);
+//  usart_interrupt_enable(USART3, USART_TDBE_INT, TRUE);
 }
 
 /**
@@ -145,9 +145,9 @@ uint8_t buffer_compare(uint8_t* pbuffer1, uint8_t* pbuffer2, uint16_t buffer_len
   */
 int usart3proc_main(void)
 {
-  system_clock_config();
-  at32_board_init();
-  usart_configuration();
+//  system_clock_config();
+//  at32_board_init();
+  usart3_configuration();
 
   /* wait until end of transmission from usart2 to usart3 */
   while(usart3_rx_counter < usart2_tx_buffer_size);

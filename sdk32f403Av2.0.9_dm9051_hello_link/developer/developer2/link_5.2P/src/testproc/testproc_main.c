@@ -499,7 +499,7 @@ void testproc_run(void)
   // printf(":  while(1);\r\n"); //since followed by a empty-while-loop.
 
   netlink_init();
-
+  
 #if 1
   at32_dm9051_tmr_init(); // dm9051_tmr_init(); //old: env_dm9051_tmr_init()
   printf(":  Connect Detecting...\r\n");

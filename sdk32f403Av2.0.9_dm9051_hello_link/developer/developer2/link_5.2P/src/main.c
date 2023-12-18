@@ -52,12 +52,16 @@ int main(void)
 {
   uint16_t id;
   system_clock_config();
-  at32_board_init();
+  at32_board_init(); 
   uart_print_init(115200);
+  usart3_configuration();    
+
 
   testproc_board_initialize(); // dm9051_board_initialize
   id = testproc_drv_initialize();
 
+  printf(": test start...\r\n");
+  
   if (id != (DM9051_ID >> 16))
   {
     printf("Chip ID wrong! Check the device board!\r\n");
