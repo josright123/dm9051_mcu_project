@@ -1,0 +1,7 @@
+{
+  "files.associations": {
+    "*.ts": "typescript",
+    "dm9051_lw_testproc.h": "c",
+    "usart3proc_main.h": "c"
+  }
+}
