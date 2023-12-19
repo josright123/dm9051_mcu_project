@@ -26,6 +26,18 @@
 #include "at32f403a_407_int.h"
 #include "tmr_init.h"
 
+extern uint8_t usart2_tx_buffer[];
+extern uint8_t usart3_tx_buffer[];
+extern uint8_t usart2_rx_buffer[];
+extern uint8_t usart3_rx_buffer[];
+extern uint8_t usart2_tx_counter;
+extern uint8_t usart3_tx_counter;
+extern uint8_t usart2_rx_counter;
+extern uint8_t usart3_rx_counter;
+extern uint8_t usart2_tx_buffer_size;
+extern uint8_t usart3_tx_buffer_size;
+
+
 /** @addtogroup AT32F403A_periph_examples
   * @{
   */
@@ -141,6 +153,84 @@ void TMR5_GLOBAL_IRQHandler(void) //Accept TMR5, NOT startup_at32f415.s ; TMR6 (
   }
 }
 #endif
+
+
+/**
+  * @brief  this function handles usart2 handler.
+  * @param  none
+  * @retval none
+  */
+void USART2_IRQHandler(void)
+{
+  if(USART2->ctrl1_bit.rdbfien != RESET)
+  {
+    if(usart_flag_get(USART2, USART_RDBF_FLAG) != RESET)
+    {
+      /* read one byte from the receive data register */
+      usart2_rx_buffer[usart2_rx_counter++] = usart_data_receive(USART2);
+
+      if(usart2_rx_counter == usart3_tx_buffer_size)
+      {
+        /* disable the usart2 receive interrupt */
+        usart_interrupt_enable(USART2, USART_RDBF_INT, FALSE);
+      }
+    }
+  }
+
+  if(USART2->ctrl1_bit.tdbeien != RESET)
+  {
+    if(usart_flag_get(USART2, USART_TDBE_FLAG) != RESET)
+    {
+      /* write one byte to the transmit data register */
+      usart_data_transmit(USART2, usart2_tx_buffer[usart2_tx_counter++]);
+
+      if(usart2_tx_counter == usart2_tx_buffer_size)
+      {
+        /* disable the usart2 transmit interrupt */
+        usart_interrupt_enable(USART2, USART_TDBE_INT, FALSE);
+      }
+    }
+  }
+}
+
+/**
+  * @brief  this function handles usart3 handler.
+  * @param  none
+  * @retval none
+  */
+void USART3_IRQHandler(void)
+{
+  if(USART3->ctrl1_bit.rdbfien != RESET)
+  {
+    if(usart_flag_get(USART3, USART_RDBF_FLAG) != RESET)
+    {
+      /* read one byte from the receive data register */
+      usart3_rx_buffer[usart3_rx_counter++] = usart_data_receive(USART3);
+
+      if(usart3_rx_counter == usart2_tx_buffer_size)
+      {
+        /* disable the usart3 receive interrupt */
+        usart_interrupt_enable(USART3, USART_RDBF_INT, FALSE);
+      }
+    }
+  }
+
+  if(USART3->ctrl1_bit.tdbeien != RESET)
+  {
+    if(usart_flag_get(USART3, USART_TDBE_FLAG) != RESET)
+    {
+      /* write one byte to the transmit data register */
+      usart_data_transmit(USART3, usart3_tx_buffer[usart3_tx_counter++]);
+
+      if(usart3_tx_counter == usart3_tx_buffer_size)
+      {
+        /* disable the usart3 transmit interrupt */
+        usart_interrupt_enable(USART3, USART_TDBE_INT, FALSE);
+      }
+    }
+  }
+}
+
 
 /**
   * @}

@@ -56,7 +56,6 @@ int main(void)
   uart_print_init(115200);
   usart3_configuration();    
 
-
   testproc_board_initialize(); // dm9051_board_initialize
   id = testproc_drv_initialize();
 
