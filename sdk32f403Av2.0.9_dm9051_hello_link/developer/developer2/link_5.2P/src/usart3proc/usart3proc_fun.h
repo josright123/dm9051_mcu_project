@@ -22,7 +22,9 @@ extern "C"
 // #define CRC16_LENGTH 2 // Length of CRC16 in bytes
 #define CRC16_LENGTH (2 + 1) // Length of CRC16 in bytes + STX byte
 
-  typedef struct _Protocol_data_
+#pragma pack(push)
+#pragma pack(1)
+  typedef struct
   {
     uint8_t stx;
     uint16_t len;
@@ -30,8 +32,10 @@ extern "C"
     uint8_t cmd;
     uint8_t *data;
     uint8_t etx;
-    uint16_t crc;
-  } Protocol_data, *pProtocol_data;
+    uint16_t crc16;
+  } USART3_PROTOCOL_DATA, *P_USART3_PROTOCOL_DATA;
+
+#pragma pack(pop)
 
   // #define MAX_BARCODE_CATEGORY			3				// Category
   // #define MAX_BARCODE_SPECIES				4				// Species

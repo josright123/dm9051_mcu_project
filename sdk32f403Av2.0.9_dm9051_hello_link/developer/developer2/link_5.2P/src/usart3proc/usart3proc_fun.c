@@ -41,6 +41,7 @@ static uint32_t current_timeout_due_time;
 
 uint8_t usart3_tx_buffer[USART3_TX_BUFFER_SIZE];
 uint8_t usart3_rx_buffer[USART3_RX_BUFFER_SIZE];
+uint8_t usart3_data_buffer[USART3_RX_BUFFER_SIZE];
 uint16_t usart3_tx_buffer_size = USART3_TX_BUFFER_SIZE;
 uint16_t usart3_rx_buffer_size = USART3_RX_BUFFER_SIZE;
 uint16_t usart3_tx_length = 0;
@@ -179,8 +180,9 @@ void usart3proc_time_event(int ms)
 
 void usart3proc_rx_data_interrupt(uint8_t rx_data)
 {
-  int rx_data_len;
-  Protocol_data protocolData;
+  uint16_t rx_data_len;
+  // Protocol_data protocolData;
+  P_USART3_PROTOCOL_DATA pProtocolData = (P_USART3_PROTOCOL_DATA)usart3_rx_buffer;
 
   // If this is the first byte we are receiving, set the timeout due time
   if (usart3_rx_counter == 0)
@@ -198,13 +200,28 @@ void usart3proc_rx_data_interrupt(uint8_t rx_data)
   }
 
   // (usart3_rx_buffer[1] | (usart3_rx_buffer[2] << 8)
-  rx_data_len = usart3_rx_buffer[1] | (usart3_rx_buffer[2] << 8);
+  // rx_data_len = usart3_rx_buffer[1] | (usart3_rx_buffer[2] << 8);
+  rx_data_len = pProtocolData->len;
+
   // If we have received the complete protocol data (based on the length field)
   // if (usart3_rx_counter >= 3 && usart3_rx_counter == (usart3_rx_buffer[1] | (usart3_rx_buffer[2] << 8)))
-  if (usart3_rx_counter >= 3 + CRC16_LENGTH && usart3_rx_counter == (usart3_rx_buffer[1] | (usart3_rx_buffer[2] << 8)) + CRC16_LENGTH)
+  // if (usart3_rx_counter >= 3 + CRC16_LENGTH && usart3_rx_counter == (usart3_rx_buffer[1] | (usart3_rx_buffer[2] << 8)) + CRC16_LENGTH)
+  if (usart3_rx_counter >= 3 + CRC16_LENGTH && usart3_rx_counter == rx_data_len + CRC16_LENGTH)
   {
     // Check if the last character is ETX
-    if (usart3_rx_buffer[rx_data_len] != ETX)
+    // if (usart3_rx_buffer[rx_data_len] != ETX)
+    // if (pProtocolData->etx != ETX)
+    // {
+    //   // The last character is not ETX, reset the counter and return
+    //   usart3_rx_counter = 0;
+    //   usart3_rx_complete_status = USART3_RX_COMPLETE_ERROR;
+    //   // at32_led_toggle(LED3);
+    //   return;
+    // }
+
+    uint8_t *etx_ptr = &usart3_rx_buffer[sizeof(USART3_PROTOCOL_DATA) - 2 + pProtocolData->len];
+
+    if (*etx_ptr != ETX)
     {
       // The last character is not ETX, reset the counter and return
       usart3_rx_counter = 0;
@@ -212,17 +229,6 @@ void usart3proc_rx_data_interrupt(uint8_t rx_data)
       // at32_led_toggle(LED3);
       return;
     }
-
-    // Parse the received data
-    protocolData.stx = usart3_rx_buffer[0];
-    protocolData.len = (usart3_rx_buffer[1] | (usart3_rx_buffer[2] << 8));
-    protocolData.op = usart3_rx_buffer[3];
-    protocolData.cmd = usart3_rx_buffer[4];
-    protocolData.data = &usart3_rx_buffer[5]; // Assuming data starts at index 5
-    protocolData.etx = usart3_rx_buffer[protocolData.len - 3];
-    protocolData.crc = (usart3_rx_buffer[protocolData.len - 2] | (usart3_rx_buffer[protocolData.len - 1] << 8));
-
-    // Process the protocol data...
 
     // Reset the counter for the next protocol data
     // usart3_rx_counter = 0;
