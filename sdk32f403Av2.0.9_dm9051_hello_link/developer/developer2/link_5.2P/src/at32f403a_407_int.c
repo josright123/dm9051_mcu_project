@@ -220,6 +220,7 @@ void USART3_IRQHandler(void)
   {
     if (usart_flag_get(USART3, USART_TDBE_FLAG) != RESET)
     {
+      usart3proc_tx_data_interrupt();
       // /* write one byte to the transmit data register */
       // usart_data_transmit(USART3, usart3_tx_buffer[usart3_tx_counter++]);
 

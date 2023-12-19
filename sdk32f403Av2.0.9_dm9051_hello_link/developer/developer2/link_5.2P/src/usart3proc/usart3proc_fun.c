@@ -41,11 +41,12 @@ static uint32_t current_timeout_due_time;
 
 uint8_t usart3_tx_buffer[USART3_TX_BUFFER_SIZE];
 uint8_t usart3_rx_buffer[USART3_RX_BUFFER_SIZE];
-uint16_t usart2_tx_buffer_size = USART3_TX_BUFFER_SIZE;
-uint16_t usart2_rx_buffer_size = USART3_RX_BUFFER_SIZE;
-volatile uint16_t usart2_tx_counter = 0x00;
-volatile uint16_t usart2_rx_counter = 0x00;
-uint16_t usart3_rx_counter = 0;
+uint16_t usart3_tx_buffer_size = USART3_TX_BUFFER_SIZE;
+uint16_t usart3_rx_buffer_size = USART3_RX_BUFFER_SIZE;
+uint16_t usart3_tx_length = 0;
+volatile uint16_t usart3_tx_counter = 0x00;
+volatile uint16_t usart3_rx_counter = 0x00;
+
 // usart3_rx 接收資料完成標誌
 // typedef enum usart3_rx_complete_flag ,ok = 1, error = 0, timeout = 2
 typedef enum
@@ -224,10 +225,25 @@ void usart3proc_rx_data_interrupt(uint8_t rx_data)
     // Process the protocol data...
 
     // Reset the counter for the next protocol data
-    usart3_rx_counter = 0;
+    // usart3_rx_counter = 0;
     usart3_rx_complete_status = USART3_RX_COMPLETE_OK;
     // at32_led_toggle(LED2);
   }
+}
+
+uint8_t usart3proc_tx_data_interrupt(void)
+{
+  if (usart3_tx_counter < usart3_tx_length)
+  {
+    usart_data_transmit(USART3, usart3_tx_buffer[usart3_tx_counter++]);
+  }
+  else
+  {
+    usart_interrupt_enable(USART3, USART_TDBE_INT, FALSE);
+    usart3_tx_counter = 0;
+    usart3_tx_length = 0;
+  }
+  return 0;
 }
 
 /**
@@ -240,6 +256,12 @@ int usart3proc_main(void)
   if (usart3_rx_complete_status == USART3_RX_COMPLETE_OK)
   {
     usart3_rx_complete_status = USART3_RX_COMPLETE_NONE;
+
+    usart3_tx_length = usart3_rx_counter;
+    memcpy((void *)&usart3_tx_buffer, (void *)&usart3_rx_buffer, usart3_rx_counter);
+    usart_interrupt_enable(USART3, USART_TDBE_INT, TRUE);
+
+    usart3_rx_counter = 0;
     at32_led_toggle(LED2);
     // at32_led_toggle(LED3);
     // at32_led_toggle(LED4);
@@ -249,7 +271,7 @@ int usart3proc_main(void)
 
   if (usart3_rx_complete_status == USART3_RX_COMPLETE_ERROR)
   {
-//    usart3_rx_complete_status = USART3_RX_COMPLETE_NONE;
+    //    usart3_rx_complete_status = USART3_RX_COMPLETE_NONE;
     // at32_led_toggle(LED2);
     at32_led_toggle(LED3);
     // at32_led_toggle(LED4);
@@ -259,7 +281,7 @@ int usart3proc_main(void)
 
   if (usart3_rx_complete_status == USART3_RX_COMPLETE_TIMEOUT)
   {
-//    usart3_rx_complete_status = USART3_RX_COMPLETE_NONE;
+    //    usart3_rx_complete_status = USART3_RX_COMPLETE_NONE;
     at32_led_toggle(LED2);
     at32_led_toggle(LED3);
     at32_led_toggle(LED4);
