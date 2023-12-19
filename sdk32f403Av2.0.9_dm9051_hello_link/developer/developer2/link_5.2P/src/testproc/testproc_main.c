@@ -509,7 +509,7 @@ void testproc_run(void)
   while (1)
   {
     threads_support();
-    //    usart3proc_main();
+    usart3proc_main();
   }
 }
 

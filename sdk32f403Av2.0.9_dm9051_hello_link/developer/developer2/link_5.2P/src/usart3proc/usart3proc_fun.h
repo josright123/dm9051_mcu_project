@@ -47,6 +47,7 @@ extern "C"
   int usart3proc_init(void);
   void usart3proc_time_event(int ms);
   void usart3proc_rx_data_interrupt(uint8_t rx_data);
+  int usart3proc_main(void);
 
 #ifdef __cplusplus
 }

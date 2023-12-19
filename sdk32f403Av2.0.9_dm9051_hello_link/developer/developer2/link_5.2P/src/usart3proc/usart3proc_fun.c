@@ -22,9 +22,11 @@
  **************************************************************************
  */
 // include memset
+#include <stdint.h>
 #include <string.h>
 #include "at32f403a_407_board.h"
 #include "at32f403a_407_clock.h"
+#include "tmr_init.h"
 #include "usart3proc_fun.h"
 
 /** @addtogroup AT32F403A_periph_examples
@@ -35,6 +37,8 @@
  * @{
  */
 
+static uint32_t current_timeout_due_time;
+
 uint8_t usart3_tx_buffer[USART3_TX_BUFFER_SIZE];
 uint8_t usart3_rx_buffer[USART3_RX_BUFFER_SIZE];
 uint16_t usart2_tx_buffer_size = USART3_TX_BUFFER_SIZE;
@@ -42,6 +46,17 @@ uint16_t usart2_rx_buffer_size = USART3_RX_BUFFER_SIZE;
 volatile uint16_t usart2_tx_counter = 0x00;
 volatile uint16_t usart2_rx_counter = 0x00;
 uint16_t usart3_rx_counter = 0;
+// usart3_rx 接收資料完成標誌
+// typedef enum usart3_rx_complete_flag ,ok = 1, error = 0, timeout = 2
+typedef enum
+{
+  USART3_RX_COMPLETE_NONE = 0,
+  USART3_RX_COMPLETE_OK = 1,
+  USART3_RX_COMPLETE_ERROR = 2,
+  USART3_RX_COMPLETE_TIMEOUT = 3,
+} usart3_rx_complete_flag;
+
+usart3_rx_complete_flag usart3_rx_complete_status = USART3_RX_COMPLETE_NONE;
 
 /**
  * @brief  config usart
@@ -153,13 +168,24 @@ int usart3proc_init(void)
 void usart3proc_time_event(int ms)
 {
   // timeout reset the rx counter.
-  usart3_rx_counter = 0;
+  // if (usart3_rx_counter > 0 && usart3_rx_counter < USART3_RX_BUFFER_SIZE && ms > 1000)
+  if (usart3_rx_counter > 0 && usart3_rx_counter < USART3_RX_BUFFER_SIZE && sys_now() > current_timeout_due_time)
+  {
+    usart3_rx_counter = 0;
+    usart3_rx_complete_status = USART3_RX_COMPLETE_TIMEOUT;
+  }
 }
 
 void usart3proc_rx_data_interrupt(uint8_t rx_data)
 {
   int rx_data_len;
   Protocol_data protocolData;
+
+  // If this is the first byte we are receiving, set the timeout due time
+  if (usart3_rx_counter == 0)
+  {
+    current_timeout_due_time = sys_now() + 1000; // Set the due time to 1 second from now
+  }
 
   // Store the received byte in the buffer
   usart3_rx_buffer[usart3_rx_counter++] = rx_data;
@@ -181,7 +207,8 @@ void usart3proc_rx_data_interrupt(uint8_t rx_data)
     {
       // The last character is not ETX, reset the counter and return
       usart3_rx_counter = 0;
-      at32_led_toggle(LED3);
+      usart3_rx_complete_status = USART3_RX_COMPLETE_ERROR;
+      // at32_led_toggle(LED3);
       return;
     }
 
@@ -198,30 +225,47 @@ void usart3proc_rx_data_interrupt(uint8_t rx_data)
 
     // Reset the counter for the next protocol data
     usart3_rx_counter = 0;
-    at32_led_toggle(LED2);
+    usart3_rx_complete_status = USART3_RX_COMPLETE_OK;
+    // at32_led_toggle(LED2);
   }
 }
 
-// int usart3proc_rx_data_interrupt(uint8_t *rx_data)
-// {
+/**
+ * @brief  main function.
+ * @param  none
+ * @retval none
+ */
+int usart3proc_main(void)
+{
+  if (usart3_rx_complete_status == USART3_RX_COMPLETE_OK)
+  {
+    usart3_rx_complete_status = USART3_RX_COMPLETE_NONE;
+    at32_led_toggle(LED2);
+    // at32_led_toggle(LED3);
+    // at32_led_toggle(LED4);
+    //    delay_ms(500);
+    printf(": USART3_RX_COMPLETE_OK...\r\n");
+  }
 
-// // ;PROTOCOL:STX,LEN_L,LEN_H,OP,CMD#,DATA,ETX,CRC_L,CRC_H
-// // ;             |<-----LENGTH------------->|
-// // ;             |<-------CRC-------------->|
-// // ;********************************************************
-// // STX     SET     02H
-// // ETX     SET     03H
+  if (usart3_rx_complete_status == USART3_RX_COMPLETE_ERROR)
+  {
+//    usart3_rx_complete_status = USART3_RX_COMPLETE_NONE;
+    // at32_led_toggle(LED2);
+    at32_led_toggle(LED3);
+    // at32_led_toggle(LED4);
+    delay_ms(200);
+    printf(": USART3_RX_COMPLETE_ERROR...\r\n");
+  }
 
-//   uint8_t rx_data_len = 0;
-//   uint8_t i = 0;
-//   for (i = 0; i < rx_data_len; i++)
-//   {
-//     usart3_rx_buffer[usart2_rx_counter++] = rx_data[i];
-//     if (usart2_rx_counter == usart2_rx_buffer_size)
-//     {
-//       usart2_rx_counter = 0;
-//     }
-//   }
+  if (usart3_rx_complete_status == USART3_RX_COMPLETE_TIMEOUT)
+  {
+//    usart3_rx_complete_status = USART3_RX_COMPLETE_NONE;
+    at32_led_toggle(LED2);
+    at32_led_toggle(LED3);
+    at32_led_toggle(LED4);
+    delay_ms(500);
+    printf(": USART3_RX_COMPLETE_TIMEOUT...\r\n");
+  }
 
-//   return 0;
-// }
+  return 0;
+}
