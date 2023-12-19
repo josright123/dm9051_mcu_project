@@ -145,7 +145,24 @@
           <Name>UL2CM3(-S0 -C0 -P0 ) -FN1 -FC1000 -FD20000000 -FF0AT32F403A_1024 -FL0100000 -FS08000000 -FP0($$Device:-AT32F403AVGT7$Flash\AT32F403A_1024.FLM)</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <Breakpoint/>
+      <Breakpoint>
+        <Bp>
+          <Number>0</Number>
+          <Type>0</Type>
+          <LineNumber>178</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>0</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>0</BreakIfRCount>
+          <Filename>..\src\usart3proc\usart3proc_fun.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
+      </Breakpoint>
       <WatchWindow1>
         <Ww>
           <count>0</count>
@@ -161,6 +178,11 @@
           <count>2</count>
           <WinNumber>1</WinNumber>
           <ItemText>tmptimeout</ItemText>
+        </Ww>
+        <Ww>
+          <count>3</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>usart3_rx_buffer</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>
@@ -305,8 +327,8 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\usart3proc\usart3proc_main.c</PathWithFileName>
-      <FilenameWithoutPath>usart3proc_main.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\usart3proc\usart3proc_fun.c</PathWithFileName>
+      <FilenameWithoutPath>usart3proc_fun.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

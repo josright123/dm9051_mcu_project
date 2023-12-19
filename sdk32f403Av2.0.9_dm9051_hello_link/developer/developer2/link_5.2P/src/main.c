@@ -40,8 +40,8 @@
 
 #include "testproc/dm9051_lw_testproc.h" //#include "dm9051_at32_decl_support.h" //#include "dm9051_at32_decl.h"
 
-// usart3proc_main.h
-#include "usart3proc/usart3proc_main.h"
+// usart3proc_fun.h
+#include "usart3proc/usart3proc_fun.h"
 
 /**
  * @brief  main function.
