@@ -177,7 +177,7 @@ void usart3proc_rx_data_interrupt(uint8_t rx_data)
   if (usart3_rx_counter >= 3 + CRC16_LENGTH && usart3_rx_counter == (usart3_rx_buffer[1] | (usart3_rx_buffer[2] << 8)) + CRC16_LENGTH)
   {
     // Check if the last character is ETX
-    if (usart3_rx_buffer[rx_data_len - 1] != ETX)
+    if (usart3_rx_buffer[rx_data_len] != ETX)
     {
       // The last character is not ETX, reset the counter and return
       usart3_rx_counter = 0;

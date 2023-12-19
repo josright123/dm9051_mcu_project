@@ -19,7 +19,8 @@ extern "C"
 #define STX 0x02 // Adjust this value based on your protocol
 #define ETX 0x03 // Adjust this value based on your protocol
 
-#define CRC16_LENGTH 2 // Length of CRC16 in bytes
+// #define CRC16_LENGTH 2 // Length of CRC16 in bytes
+#define CRC16_LENGTH (2 + 1) // Length of CRC16 in bytes + STX byte
 
   typedef struct _Protocol_data_
   {
