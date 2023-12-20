@@ -31,8 +31,9 @@ extern "C"
     uint8_t op;
     uint8_t cmd;
     uint8_t *data;
-    uint8_t etx;
-    uint16_t crc16;
+    // variable length data
+    // uint8_t etx;
+    // uint16_t crc16;
   } USART3_PROTOCOL_DATA, *P_USART3_PROTOCOL_DATA;
 
 #pragma pack(pop)
