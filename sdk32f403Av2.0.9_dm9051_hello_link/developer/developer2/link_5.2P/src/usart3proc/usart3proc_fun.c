@@ -49,6 +49,8 @@ uint16_t usart3_data_buffer_length = 0;
 volatile uint16_t usart3_tx_counter = 0x00;
 volatile uint16_t usart3_rx_counter = 0x00;
 
+uint8_t m_uiMachineState;
+
 // usart3_rx 接收資料完成標誌
 // typedef enum usart3_rx_complete_flag ,ok = 1, error = 0, timeout = 2
 typedef enum
@@ -299,7 +301,7 @@ int usart3proc_main(void)
       usart3_tx_length = usart3_data_buffer_length;
       memcpy((void *)&usart3_tx_buffer, (void *)&usart3_data_buffer, usart3_data_buffer_length);
       usart_interrupt_enable(USART3, USART_TDBE_INT, TRUE);
-      usart3_rx_counter = 0;
+//      usart3_rx_counter = 0;
       at32_led_toggle(LED2);
       // printf(": calculated_crc OK...\r\n");
       printf(": USART3_RX_COMPLETE_OK...\r\n");
