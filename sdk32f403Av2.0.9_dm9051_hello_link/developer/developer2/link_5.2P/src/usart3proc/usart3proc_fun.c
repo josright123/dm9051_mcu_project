@@ -45,6 +45,7 @@ uint8_t usart3_data_buffer[USART3_RX_BUFFER_SIZE];
 uint16_t usart3_tx_buffer_size = USART3_TX_BUFFER_SIZE;
 uint16_t usart3_rx_buffer_size = USART3_RX_BUFFER_SIZE;
 uint16_t usart3_tx_length = 0;
+uint16_t usart3_data_buffer_length = 0;
 volatile uint16_t usart3_tx_counter = 0x00;
 volatile uint16_t usart3_rx_counter = 0x00;
 
@@ -56,6 +57,8 @@ typedef enum
   USART3_RX_COMPLETE_OK = 1,
   USART3_RX_COMPLETE_ERROR = 2,
   USART3_RX_COMPLETE_TIMEOUT = 3,
+  // crc16 error
+  USART3_RX_COMPLETE_CRC16_ERROR = 4,
 } usart3_rx_complete_flag;
 
 usart3_rx_complete_flag usart3_rx_complete_status = USART3_RX_COMPLETE_NONE;
@@ -239,6 +242,11 @@ void usart3proc_rx_data_interrupt(uint8_t rx_data)
 
     // Reset the counter for the next protocol data
     // usart3_rx_counter = 0;
+
+    memcpy((void *)&usart3_data_buffer, (void *)&usart3_rx_buffer, usart3_rx_counter);
+    usart3_data_buffer_length = usart3_rx_counter;
+
+    usart3_rx_counter = 0;
     usart3_rx_complete_status = USART3_RX_COMPLETE_OK;
     // at32_led_toggle(LED2);
   }
@@ -271,7 +279,7 @@ int usart3proc_main(void)
   uint16_t calculated_crc;
 
   // USART3_PROTOCOL_DATA protocolData;
-  P_USART3_PROTOCOL_DATA pProtocolData = (P_USART3_PROTOCOL_DATA)usart3_rx_buffer;
+  P_USART3_PROTOCOL_DATA pProtocolData = (P_USART3_PROTOCOL_DATA)usart3_data_buffer;
 
   switch (usart3_rx_complete_status)
   {
@@ -279,8 +287,8 @@ int usart3proc_main(void)
     usart3_rx_complete_status = USART3_RX_COMPLETE_NONE;
     rx_data_len = pProtocolData->len;
 
-    data_crc16 = usart3_rx_buffer[rx_data_len + 1] | (usart3_rx_buffer[rx_data_len + 2] << 8);
-    calculated_crc = calculate_crc16((uint8_t *)usart3_rx_buffer + 1, rx_data_len);
+    data_crc16 = usart3_data_buffer[rx_data_len + 1] | (usart3_data_buffer[rx_data_len + 2] << 8);
+    calculated_crc = calculate_crc16((uint8_t *)usart3_data_buffer + 1, rx_data_len);
 
     printf(": calculated_crc: %X \r\n", calculated_crc);
 
@@ -288,8 +296,8 @@ int usart3proc_main(void)
     {
       // CRC16 is valid, process the data
       // CRC16 is correct, process the data
-      usart3_tx_length = usart3_rx_counter;
-      memcpy((void *)&usart3_tx_buffer, (void *)&usart3_rx_buffer, usart3_rx_counter);
+      usart3_tx_length = usart3_data_buffer_length;
+      memcpy((void *)&usart3_tx_buffer, (void *)&usart3_data_buffer, usart3_data_buffer_length);
       usart_interrupt_enable(USART3, USART_TDBE_INT, TRUE);
       usart3_rx_counter = 0;
       at32_led_toggle(LED2);
@@ -299,12 +307,12 @@ int usart3proc_main(void)
     else
     {
       // CRC16 is invalid, handle the error
-      usart3_tx_length = usart3_rx_counter;
-      memcpy((void *)&usart3_tx_buffer, (void *)&usart3_rx_buffer, usart3_rx_counter);
+      usart3_tx_length = usart3_data_buffer_length;
+      memcpy((void *)&usart3_tx_buffer, (void *)&usart3_data_buffer, usart3_data_buffer_length);
       usart_interrupt_enable(USART3, USART_TDBE_INT, TRUE);
       usart3_rx_counter = 0;
       at32_led_toggle(LED2);
-      usart3_rx_complete_status = USART3_RX_COMPLETE_ERROR;
+      usart3_rx_complete_status = USART3_RX_COMPLETE_CRC16_ERROR;
       printf(": calculated_crc ERROR...\r\n");
     }
 
@@ -325,6 +333,15 @@ int usart3proc_main(void)
     at32_led_toggle(LED4);
     delay_ms(500);
     printf(": USART3_RX_COMPLETE_TIMEOUT...\r\n");
+    break;
+
+  case USART3_RX_COMPLETE_CRC16_ERROR:
+    // usart3_rx_complete_status = USART3_RX_COMPLETE_NONE;
+    at32_led_toggle(LED2);
+    at32_led_toggle(LED3);
+    at32_led_toggle(LED4);
+    delay_ms(100);
+    printf(": USART3_RX_COMPLETE_CRC16_ERROR...\r\n");
     break;
 
   default:
