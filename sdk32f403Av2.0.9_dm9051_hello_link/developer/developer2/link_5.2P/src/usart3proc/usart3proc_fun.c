@@ -184,7 +184,7 @@ void usart3proc_rx_data_interrupt(uint8_t rx_data)
   // USART3_PROTOCOL_DATA protocolData;
   P_USART3_PROTOCOL_DATA pProtocolData = (P_USART3_PROTOCOL_DATA)usart3_rx_buffer;
   // variable length data
-  pProtocolData->data = &usart3_data_buffer[5];
+  //  pProtocolData->data = &usart3_data_buffer[5];
 
   // If this is the first byte we are receiving, set the timeout due time
   if (usart3_rx_counter == 0)
