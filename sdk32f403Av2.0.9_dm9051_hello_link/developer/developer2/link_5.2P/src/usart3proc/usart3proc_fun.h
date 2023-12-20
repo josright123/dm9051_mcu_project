@@ -30,7 +30,7 @@ extern "C"
     uint16_t len;
     uint8_t op;
     uint8_t cmd;
-    uint8_t *data;
+    // uint8_t *data;
     // variable length data
     // uint8_t etx;
     // uint16_t crc16;
