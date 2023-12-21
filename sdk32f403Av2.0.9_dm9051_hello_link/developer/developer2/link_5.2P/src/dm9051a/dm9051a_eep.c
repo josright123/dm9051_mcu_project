@@ -54,7 +54,7 @@ void show_status()
   // reg = 0x29; 0x0A, high byte, 0x0a
   buf[0] = DM9051_Read_Reg(0x28); // low byte
   buf[1] = DM9051_Read_Reg(0x29); // high byte
-  printf(": REG29_28=%04X\r\n", (uint16_t)(buf[1] << 8 | buf[0]));
+  // printf(": REG29_28=%04X\r\n", (uint16_t)(buf[1] << 8 | buf[0]));
   printf(": REG29_28=%04X\r\n", *(uint16_t *)buf);
 
   // reg = 0x40;
@@ -70,10 +70,21 @@ void show_status()
   // printf("  REG1E=%2x", buf[0]);
   // printf("  REG1F=%2x", buf[1]);
 
-  // reg = 0x10;
+  reg = 0x10;
   // length = 6;
-  // dm_rd_reg(usb_handle, reg, length, buf);
+  DM9051_Read_Regnx(reg, 6, buf);
+  printf(": REG10~15=");
+  for (int i = 0; i < 6; i++)
+  {
+    printf("%02X", buf[i]);
+    if (i != 5)
+    {
+      printf(":");
+    }
+  }
+  printf("\n");
 
+  // dm_rd_reg(usb_handle, reg, length, buf);
   // printf("  REG10~15=");
   // if (buf[0] < 16)
   //   printf("0%1x:", buf[0]);
@@ -99,7 +110,6 @@ void show_status()
   //   printf("0%1x", buf[5]);
   // else
   //   printf("%2x", buf[5]);
-
   // printf("\n");
 
   // reg = 0x20;
