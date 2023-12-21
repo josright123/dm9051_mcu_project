@@ -58,7 +58,9 @@ void show_status()
   // printf(": REG29_28=%04X\r\n", *(uint16_t *)buf);
 
   // DM9051_Read_Regnx(reg, length, buf);
-  DM9051_Read_Regnx(0x28, 2, buf);
+  // DM9051_Read_Regnx(0x28, 2, buf);
+  // DM9051_VIDL register name is 0x28.
+  DM9051_Read_Regnx(DM9051_VIDL, 2, buf);
   printf(": REG29_28=%04X\r\n", *(uint16_t *)buf);
 
   // reg = 0x40;
@@ -78,7 +80,7 @@ void show_status()
   // Physical Address Registers (PARs) 0x10~0x15
   reg = 0x10;
   // length = 6;
-  DM9051_Read_Regnx(reg, 6, buf);
+  DM9051_Read_Regnx(DM9051_PAR, 6, buf);
   printf(": REG10~15=");
   for (int i = 0; i < 6; i++)
   {
@@ -95,10 +97,10 @@ void show_status()
   // const uint8_t MACaddr[6] = {0x00, 0x60, 0x6e, 0x55, 0x01, 0x25};
   // Physical Address Registers (PARs) 0x10~0x15
   reg = 0x10;
-  DM9051_Write_Regnx(reg, 6, (uint8_t *)MACaddr);
+  DM9051_Write_Regnx(DM9051_PAR, 6, (uint8_t *)MACaddr);
 
   // Physical Address Registers (PARs) 0x10~0x15
-  DM9051_Read_Regnx(reg, 6, buf);
+  DM9051_Read_Regnx(DM9051_PAR, 6, buf);
   printf(": REG10~15=");
   for (int i = 0; i < 6; i++)
   {
