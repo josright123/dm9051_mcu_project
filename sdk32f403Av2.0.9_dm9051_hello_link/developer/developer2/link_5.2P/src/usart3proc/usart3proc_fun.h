@@ -22,6 +22,17 @@ extern "C"
 // #define CRC16_LENGTH 2 // Length of CRC16 in bytes
 #define CRC16_LENGTH (2 + 1) // Length of CRC16 in bytes + STX byte
 
+//==============================================================================
+//--- Declarative Machine State ---
+//==============================================================================
+// Operating system machine state
+#define OSMS_PWRBEACON_STATE 1 //
+#define OSMS_DATA_STATE 2
+#define OSMS_REPLYRESULT_STATE 3
+#define OSMS_FAIL_STATE 4
+
+#define OSMS_WAITTING_RESULT_STATE 30
+
 #pragma pack(push)
 #pragma pack(1)
   typedef struct
@@ -54,6 +65,7 @@ extern "C"
   void usart3proc_rx_data_interrupt(uint8_t rx_data);
   uint8_t usart3proc_tx_data_interrupt(void);
   int usart3proc_main(void);
+  void SetMachineState(uint8_t uiMachineState);
 
 #ifdef __cplusplus
 }

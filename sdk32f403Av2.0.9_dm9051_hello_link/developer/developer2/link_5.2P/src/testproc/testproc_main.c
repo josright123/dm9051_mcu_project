@@ -474,7 +474,7 @@ void sys_check_timeouts(void)
 #if 0  // LWIP_DEBUG_TIMERNAMES
     if (handler != NULL) {
       LWIP_DEBUGF(TIMERS_DEBUG, ("sct calling h=%s t=%"U32_F" arg=%p\n",
-                                 tmptimeout->handler_name, sys_now() - tmptimeout->time, arg));
+      tmptimeout->handler_name, sys_now() - tmptimeout->time, arg));
     }
 #endif /* LWIP_DEBUG_TIMERNAMES */
     memp_free(MEMP_SYS_TIMEOUT, tmptimeout);

@@ -49,7 +49,7 @@ uint16_t usart3_data_buffer_length = 0;
 volatile uint16_t usart3_tx_counter = 0x00;
 volatile uint16_t usart3_rx_counter = 0x00;
 
-uint8_t m_uiMachineState;
+static uint8_t m_uiMachineState;
 
 // usart3_rx 接收資料完成標誌
 // typedef enum usart3_rx_complete_flag ,ok = 1, error = 0, timeout = 2
@@ -167,6 +167,10 @@ int usart3proc_init(void)
   at32_led_toggle(LED2);
   at32_led_toggle(LED3);
   at32_led_toggle(LED4);
+
+  // Initial Variables
+  SetMachineState(OSMS_PWRBEACON_STATE); // Initial state
+
   // delay_sec(1);
   printf(": usart3proc_init ...\r\n");
   return 0;
@@ -199,6 +203,11 @@ uint16_t calculate_crc16(const uint8_t *data, size_t length)
   }
 
   return crc;
+}
+
+void SetMachineState(uint8_t uiMachineState)
+{
+  m_uiMachineState = uiMachineState;
 }
 
 void usart3proc_rx_data_interrupt(uint8_t rx_data)
@@ -283,71 +292,107 @@ int usart3proc_main(void)
   // USART3_PROTOCOL_DATA protocolData;
   P_USART3_PROTOCOL_DATA pProtocolData = (P_USART3_PROTOCOL_DATA)usart3_data_buffer;
 
-  switch (usart3_rx_complete_status)
+  // // Initial Variables
+  // SetMachineState(OSMS_PWRBEACON_STATE); // Initial state
+
+  // 加入 switch case m_uiMachineState Machine State
+  switch (m_uiMachineState)
   {
-  case USART3_RX_COMPLETE_OK:
-    usart3_rx_complete_status = USART3_RX_COMPLETE_NONE;
-    rx_data_len = pProtocolData->len;
+  case OSMS_PWRBEACON_STATE:
+    printf(": OSMS_PWRBEACON_STATE...\r\n");
+    SetMachineState(OSMS_DATA_STATE);
+    break;
 
-    data_crc16 = usart3_data_buffer[rx_data_len + 1] | (usart3_data_buffer[rx_data_len + 2] << 8);
-    calculated_crc = calculate_crc16((uint8_t *)usart3_data_buffer + 1, rx_data_len);
+  case OSMS_DATA_STATE:
+    // printf(": OSMS_DATA_STATE...\r\n");
+    // SetMachineState(OSMS_REPLYRESULT_STATE);
 
-    printf(": calculated_crc: %X \r\n", calculated_crc);
-
-    if (calculated_crc == data_crc16)
+    switch (usart3_rx_complete_status)
     {
-      // CRC16 is valid, process the data
-      // CRC16 is correct, process the data
-      usart3_tx_length = usart3_data_buffer_length;
-      memcpy((void *)&usart3_tx_buffer, (void *)&usart3_data_buffer, usart3_data_buffer_length);
-      usart_interrupt_enable(USART3, USART_TDBE_INT, TRUE);
-//      usart3_rx_counter = 0;
+    case USART3_RX_COMPLETE_OK:
+      usart3_rx_complete_status = USART3_RX_COMPLETE_NONE;
+      rx_data_len = pProtocolData->len;
+
+      data_crc16 = usart3_data_buffer[rx_data_len + 1] | (usart3_data_buffer[rx_data_len + 2] << 8);
+      calculated_crc = calculate_crc16((uint8_t *)usart3_data_buffer + 1, rx_data_len);
+
+      printf(": calculated_crc: %X \r\n", calculated_crc);
+
+      if (calculated_crc == data_crc16)
+      {
+        // CRC16 is valid, process the data
+        // CRC16 is correct, process the data
+        usart3_tx_length = usart3_data_buffer_length;
+        memcpy((void *)&usart3_tx_buffer, (void *)&usart3_data_buffer, usart3_data_buffer_length);
+        usart_interrupt_enable(USART3, USART_TDBE_INT, TRUE);
+        //      usart3_rx_counter = 0;
+        at32_led_toggle(LED2);
+        // printf(": calculated_crc OK...\r\n");
+        printf(": USART3_RX_COMPLETE_OK...\r\n");
+      }
+      else
+      {
+        // CRC16 is invalid, handle the error
+        usart3_tx_length = usart3_data_buffer_length;
+        memcpy((void *)&usart3_tx_buffer, (void *)&usart3_data_buffer, usart3_data_buffer_length);
+        usart_interrupt_enable(USART3, USART_TDBE_INT, TRUE);
+        usart3_rx_counter = 0;
+        at32_led_toggle(LED2);
+        usart3_rx_complete_status = USART3_RX_COMPLETE_CRC16_ERROR;
+        printf(": calculated_crc ERROR...\r\n");
+      }
+
+      break;
+
+    case USART3_RX_COMPLETE_ERROR:
+      // usart3_rx_complete_status = USART3_RX_COMPLETE_NONE;
+      // at32_led_toggle(LED2);
+      at32_led_toggle(LED3);
+      delay_ms(200);
+      printf(": USART3_RX_COMPLETE_ERROR...\r\n");
+      break;
+
+    case USART3_RX_COMPLETE_TIMEOUT:
+      // usart3_rx_complete_status = USART3_RX_COMPLETE_NONE;
       at32_led_toggle(LED2);
-      // printf(": calculated_crc OK...\r\n");
-      printf(": USART3_RX_COMPLETE_OK...\r\n");
-    }
-    else
-    {
-      // CRC16 is invalid, handle the error
-      usart3_tx_length = usart3_data_buffer_length;
-      memcpy((void *)&usart3_tx_buffer, (void *)&usart3_data_buffer, usart3_data_buffer_length);
-      usart_interrupt_enable(USART3, USART_TDBE_INT, TRUE);
-      usart3_rx_counter = 0;
+      at32_led_toggle(LED3);
+      at32_led_toggle(LED4);
+      delay_ms(500);
+      printf(": USART3_RX_COMPLETE_TIMEOUT...\r\n");
+      break;
+
+    case USART3_RX_COMPLETE_CRC16_ERROR:
+      // usart3_rx_complete_status = USART3_RX_COMPLETE_NONE;
       at32_led_toggle(LED2);
-      usart3_rx_complete_status = USART3_RX_COMPLETE_CRC16_ERROR;
-      printf(": calculated_crc ERROR...\r\n");
+      at32_led_toggle(LED3);
+      at32_led_toggle(LED4);
+      delay_ms(100);
+      printf(": USART3_RX_COMPLETE_CRC16_ERROR...\r\n");
+      break;
+
+    default:
+      // Handle any other cases if needed
+      break;
     }
-
+    // case OSMS_DATA_STATE: end
     break;
 
-  case USART3_RX_COMPLETE_ERROR:
-    // usart3_rx_complete_status = USART3_RX_COMPLETE_NONE;
-    // at32_led_toggle(LED2);
-    at32_led_toggle(LED3);
-    delay_ms(200);
-    printf(": USART3_RX_COMPLETE_ERROR...\r\n");
+  case OSMS_REPLYRESULT_STATE:
+    printf(": OSMS_REPLYRESULT_STATE...\r\n");
+    SetMachineState(OSMS_PWRBEACON_STATE);
+
+    // case OSMS_REPLYRESULT_STATE: end
     break;
 
-  case USART3_RX_COMPLETE_TIMEOUT:
-    // usart3_rx_complete_status = USART3_RX_COMPLETE_NONE;
-    at32_led_toggle(LED2);
-    at32_led_toggle(LED3);
-    at32_led_toggle(LED4);
-    delay_ms(500);
-    printf(": USART3_RX_COMPLETE_TIMEOUT...\r\n");
-    break;
+  case OSMS_FAIL_STATE:
+    printf(": OSMS_FAIL_STATE...\r\n");
+    SetMachineState(OSMS_PWRBEACON_STATE);
 
-  case USART3_RX_COMPLETE_CRC16_ERROR:
-    // usart3_rx_complete_status = USART3_RX_COMPLETE_NONE;
-    at32_led_toggle(LED2);
-    at32_led_toggle(LED3);
-    at32_led_toggle(LED4);
-    delay_ms(100);
-    printf(": USART3_RX_COMPLETE_CRC16_ERROR...\r\n");
+    // case OSMS_FAIL_STATE: end
     break;
 
   default:
-    // Handle any other cases if needed
+
     break;
   }
 
