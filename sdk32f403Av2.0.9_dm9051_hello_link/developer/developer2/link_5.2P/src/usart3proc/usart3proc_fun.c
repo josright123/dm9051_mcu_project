@@ -193,17 +193,14 @@ void usart3proc_time_event(int ms)
 uint16_t calculate_crc16(const uint8_t *data, size_t length)
 {
   uint16_t crc = 0xFFFF; // Initial value
-
   for (size_t i = 0; i < length; ++i)
   {
     crc ^= data[i];
-
     for (int j = 0; j < 8; ++j)
     {
       crc = (crc & 1) ? ((crc >> 1) ^ 0xA001) : (crc >> 1);
     }
   }
-
   return crc;
 }
 

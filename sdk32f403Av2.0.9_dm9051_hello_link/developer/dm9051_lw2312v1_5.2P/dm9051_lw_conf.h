@@ -37,6 +37,7 @@ void cpin_poweron_reset(void);
 uint8_t cspi_read_reg(uint8_t reg);
 void cspi_read_regnx(uint8_t reg, uint8_t length, uint8_t *buf);
 void cspi_write_reg(uint8_t reg, uint8_t val);
+void cspi_write_regnx(uint8_t reg, uint8_t length, uint8_t *buf);
 uint8_t cspi_read_mem2x(void);
 void cspi_read_mem(u8 *buf, u16 len);
 void cspi_write_mem(u8 *buf, u16 len);
@@ -45,6 +46,7 @@ void cspi_write_mem(u8 *buf, u16 len);
 #define DM9051_Read_Reg cspi_read_reg
 #define DM9051_Read_Regnx cspi_read_regnx
 #define DM9051_Write_Reg cspi_write_reg
+#define DM9051_Write_Regnx cspi_write_regnx
 #define DM9051_Read_Mem2X cspi_read_mem2x
 #define DM9051_Read_Mem cspi_read_mem
 #define DM9051_Write_Mem cspi_write_mem

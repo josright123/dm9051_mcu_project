@@ -7,7 +7,7 @@
 
 /* [DM9051 device mac address] */
 #if (ETHERNET_COUNT == 1)
-static const uint8_t MACaddr[6] = {0xAA, 0x60, 0x6e, 0x55, 0x01, 0x25};
+static const uint8_t MACaddr[6] = {0x00, 0x60, 0x6e, 0x55, 0x01, 0x25};
 #endif
 
 // for 'main'

@@ -52,9 +52,13 @@ void show_status()
 
   // reg = 0x28; 0x46, low byte, VID = 0x0A46
   // reg = 0x29; 0x0A, high byte, 0x0a
-  buf[0] = DM9051_Read_Reg(0x28); // low byte
-  buf[1] = DM9051_Read_Reg(0x29); // high byte
-  // printf(": REG29_28=%04X\r\n", (uint16_t)(buf[1] << 8 | buf[0]));
+  // buf[0] = DM9051_Read_Reg(0x28); // low byte
+  // buf[1] = DM9051_Read_Reg(0x29); // high byte
+  // // printf(": REG29_28=%04X\r\n", (uint16_t)(buf[1] << 8 | buf[0]));
+  // printf(": REG29_28=%04X\r\n", *(uint16_t *)buf);
+
+  // DM9051_Read_Regnx(reg, length, buf);
+  DM9051_Read_Regnx(0x28, 2, buf);
   printf(": REG29_28=%04X\r\n", *(uint16_t *)buf);
 
   // reg = 0x40;
@@ -70,6 +74,8 @@ void show_status()
   // printf("  REG1E=%2x", buf[0]);
   // printf("  REG1F=%2x", buf[1]);
 
+  // MAC address = 0x00:0x60:0x6e:0x55:0x01:0x25  // original
+  // Physical Address Registers (PARs) 0x10~0x15
   reg = 0x10;
   // length = 6;
   DM9051_Read_Regnx(reg, 6, buf);
@@ -82,35 +88,26 @@ void show_status()
       printf(":");
     }
   }
-  printf("\n");
+  printf("\r\n");
 
-  // dm_rd_reg(usb_handle, reg, length, buf);
-  // printf("  REG10~15=");
-  // if (buf[0] < 16)
-  //   printf("0%1x:", buf[0]);
-  // else
-  //   printf("%2x:", buf[0]);
-  // if (buf[1] < 16)
-  //   printf("0%1x:", buf[1]);
-  // else
-  //   printf("%2x:", buf[1]);
-  // if (buf[2] < 16)
-  //   printf("0%1x:", buf[2]);
-  // else
-  //   printf("%2x:", buf[2]);
-  // if (buf[3] < 16)
-  //   printf("0%1x:", buf[3]);
-  // else
-  //   printf("%2x:", buf[3]);
-  // if (buf[4] < 16)
-  //   printf("0%1x:", buf[4]);
-  // else
-  //   printf("%2x:", buf[4]);
-  // if (buf[5] < 16)
-  //   printf("0%1x", buf[5]);
-  // else
-  //   printf("%2x", buf[5]);
-  // printf("\n");
+  const uint8_t MACaddr[6] = {0xF0, 0x60, 0xFE, 0xF5, 0xF1, 0xF5};
+  // const uint8_t MACaddr[6] = {0x00, 0x60, 0x6e, 0x55, 0x01, 0x25};
+  // Physical Address Registers (PARs) 0x10~0x15
+  reg = 0x10;
+  DM9051_Write_Regnx(reg, 6, (uint8_t *)MACaddr);
+
+  // Physical Address Registers (PARs) 0x10~0x15
+  DM9051_Read_Regnx(reg, 6, buf);
+  printf(": REG10~15=");
+  for (int i = 0; i < 6; i++)
+  {
+    printf("%02X", buf[i]);
+    if (i != 5)
+    {
+      printf(":");
+    }
+  }
+  printf("\r\n");
 
   // reg = 0x20;
   // length = 2;
