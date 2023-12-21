@@ -28,6 +28,8 @@
 #include "at32f403a_407_clock.h"
 #include "tmr_init.h"
 #include "usart3proc_fun.h"
+// "dm9051a_eep.h"
+#include "../dm9051a/dm9051a_eep.h"
 
 /** @addtogroup AT32F403A_periph_examples
  * @{
@@ -256,6 +258,9 @@ void usart3proc_rx_data_interrupt(uint8_t rx_data)
 
     memcpy((void *)&usart3_data_buffer, (void *)&usart3_rx_buffer, usart3_rx_counter);
     usart3_data_buffer_length = usart3_rx_counter;
+
+    // test dm9051a show_status
+    show_status();
 
     usart3_rx_counter = 0;
     usart3_rx_complete_status = USART3_RX_COMPLETE_OK;
