@@ -3344,6 +3344,7 @@ void test_wr_e_fuse()
     printf("e-fuse data:");
     scanf("%x", &wdata);
 
+    // Power on e-fuse, write enable, power down phy chip
     // reg = 0x1f; length=1;
     // buf[0]=0x01;
     // dm_wr_reg(usb_handle, reg, length, buf);
@@ -3370,6 +3371,7 @@ void test_wr_e_fuse()
   dm_wr_reg(usb_handle, reg, length, buf);
 #endif
 
+    // Power off e-fuse, write disable, power up phy chip
     // reg = 0x1f; length=1;
     // buf[0]=0x00;
     // dm_wr_reg(usb_handle, reg, length, buf);

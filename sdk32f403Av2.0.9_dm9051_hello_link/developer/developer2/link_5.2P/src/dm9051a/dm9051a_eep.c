@@ -7,19 +7,11 @@
 /*************************************************************************/
 /*   show chip status                                                    */
 /*************************************************************************/
-void show_status()
+void dm9051a_show_status()
 {
   unsigned char reg;
   // unsigned short length;
   unsigned char buf[SZBUF];
-
-  /* read register , with error report*/
-  /*
-      reg = 0x2a; length=1;
-      retval = dm_rd_reg(usb_handle, reg, length, buf);
-      if (retval<0) printf("%s\n", usb_strerror());
-      else printf("retval=%d, reg 0x%02x = 0x%02x\n", retval, reg, buf[0]);
-  */
 
   // **** Chip ID
   // reg = 0x2a;
@@ -63,19 +55,6 @@ void show_status()
   DM9051_Read_Regnx(DM9051_VIDL, 2, buf);
   printf(": REG29_28=%04X\r\n", *(uint16_t *)buf);
 
-  // reg = 0x40;
-  // length = 5;
-  // dm_rd_reg(usb_handle, reg, length, buf);
-  // printf("  REG40-44=%2x,%2x,%2x,%2x,%2x",
-  //        buf[0], buf[1], buf[2], buf[3], buf[4]);
-  // printf("\n");
-
-  // reg = 0x1e;
-  // length = 2;
-  // dm_rd_reg(usb_handle, reg, length, buf);
-  // printf("  REG1E=%2x", buf[0]);
-  // printf("  REG1F=%2x", buf[1]);
-
   // MAC address = 0x00:0x60:0x6e:0x55:0x01:0x25  // original
   // Physical Address Registers (PARs) 0x10~0x15
   reg = 0x10;
@@ -111,42 +90,4 @@ void show_status()
     }
   }
   printf("\r\n");
-
-  // reg = 0x20;
-  // length = 2;
-  // dm_rd_reg(usb_handle, reg, length, buf);
-  // printf("REG21_20(TX_WR)=%2x", buf[1]);
-  // if (buf[0] > 15)
-  //   printf("%2x", buf[0]);
-  // else
-  //   printf("0%1x", buf[0]);
-
-  // reg = 0x24;
-  // length = 2;
-  // dm_rd_reg(usb_handle, reg, length, buf);
-  // printf("   REG25_24(RX_WR)=%2x", buf[1]);
-  // if (buf[0] > 15)
-  //   printf("%2x", buf[0]);
-  // else
-  //   printf("0%1x", buf[0]);
-  // printf("\n");
-
-  // reg = 0x22;
-  // length = 2;
-  // dm_rd_reg(usb_handle, reg, length, buf);
-  // printf("REG23_22(TX_RD)=%2x", buf[1]);
-  // if (buf[0] > 15)
-  //   printf("%2x", buf[0]);
-  // else
-  //   printf("0%1x", buf[0]);
-
-  // reg = 0x26;
-  // length = 2;
-  // dm_rd_reg(usb_handle, reg, length, buf);
-  // printf("   REG27_26(RX_RD)=%2x", buf[1]);
-  // if (buf[0] > 15)
-  //   printf("%2x", buf[0]);
-  // else
-  //   printf("0%1x", buf[0]);
-  printf("\n");
 }
