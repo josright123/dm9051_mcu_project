@@ -256,10 +256,6 @@ void usart3proc_rx_data_interrupt(uint8_t rx_data)
     memcpy((void *)&usart3_data_buffer, (void *)&usart3_rx_buffer, usart3_rx_counter);
     usart3_data_buffer_length = usart3_rx_counter;
 
-    // test dm9051a show_status
-    dm9051a_show_status();
-    dm9051a_show_e_fuse();
-
     usart3_rx_counter = 0;
     usart3_rx_complete_status = USART3_RX_COMPLETE_OK;
     // at32_led_toggle(LED2);
@@ -291,6 +287,7 @@ int usart3proc_main(void)
   uint16_t rx_data_len;
   uint16_t data_crc16;
   uint16_t calculated_crc;
+  uint16_t length;
 
   // USART3_PROTOCOL_DATA protocolData;
   P_USART3_PROTOCOL_DATA pProtocolData = (P_USART3_PROTOCOL_DATA)usart3_data_buffer;
@@ -328,8 +325,32 @@ int usart3proc_main(void)
         usart3_tx_length = usart3_data_buffer_length;
         memcpy((void *)&usart3_tx_buffer, (void *)&usart3_data_buffer, usart3_data_buffer_length);
         usart_interrupt_enable(USART3, USART_TDBE_INT, TRUE);
+
+        // length = sizeof(usart3_tx_buffer) / sizeof(uint16_t);
+        // printf(": usart3_tx_buffer length: %d \r\n", length);
+
         //      usart3_rx_counter = 0;
         at32_led_toggle(LED2);
+
+        // test dm9051a show_status
+        printf(": dm9051a_show_status...\r\n");
+        dm9051a_show_status();
+        dm9051a_show_e_fuse();
+
+        // Test e-fuse read
+        printf(": dm9051a_rd_e_fuse...\r\n");
+        dm9051a_rd_e_fuse(0);
+        dm9051a_rd_e_fuse(1);
+        dm9051a_rd_e_fuse(2);
+        dm9051a_rd_e_fuse(3);
+
+        // Test e-fuse write
+        printf(": dm9051a_wr_e_fuse...\r\n");
+        dm9051a_wr_e_fuse(0, 0x5555);
+        dm9051a_wr_e_fuse(1, 0xAAAA);
+        dm9051a_wr_e_fuse(2, 0x5555);
+        dm9051a_wr_e_fuse(3, 0xAAAA);
+
         // printf(": calculated_crc OK...\r\n");
         printf(": USART3_RX_COMPLETE_OK...\r\n");
       }

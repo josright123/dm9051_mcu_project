@@ -10,6 +10,10 @@ extern "C"
 
   void dm9051a_show_status(void);
   void dm9051a_show_e_fuse(void);
+  int dm9051a_rd_eep(unsigned char addr);
+  // int dm9051a_wr_eep(unsigned char reg_no, unsigned int wdata);
+  void dm9051a_rd_e_fuse(unsigned char addr);
+  void dm9051a_wr_e_fuse(unsigned int addr, unsigned int wdata);
 
 #ifdef __cplusplus
 }

@@ -43,9 +43,67 @@ int8_t wait_phy_end()
 }
 
 /*************************************************************************/
+/*      write EEPROM ------ E-Fuse                                       */
+/*************************************************************************/
+int dm9051a_wr_eep(unsigned char addr, unsigned int wdata)
+{
+  unsigned char valx;
+  unsigned char reg;
+  unsigned short length;
+  unsigned char buf[SZBUF];
+
+  valx = 0x00 | addr;
+  reg = 0x0c;
+  length = 1;
+  buf[0] = valx;
+  // dm_wr_reg(usb_handle, reg, length, buf);
+  DM9051_Write_Regnx(reg, length, buf);
+
+  valx = wdata & 0xff;
+  reg = 0x0d;
+  length = 1;
+  buf[0] = valx;
+  // dm_wr_reg(usb_handle, reg, length, buf);
+  DM9051_Write_Regnx(reg, length, buf);
+
+  valx = (wdata >> 8) & 0xff;
+  reg = 0x0e;
+  length = 1;
+  buf[0] = valx;
+  // dm_wr_reg(usb_handle, reg, length, buf);
+  DM9051_Write_Regnx(reg, length, buf);
+
+  reg = 0x0b;
+  length = 1;
+  buf[0] = 0x10;
+  // dm_wr_reg(usb_handle, reg, length, buf);
+  DM9051_Write_Regnx(reg, length, buf);
+
+  reg = 0x0b;
+  length = 1;
+  buf[0] = 0x12;
+  // dm_wr_reg(usb_handle, reg, length, buf);
+  DM9051_Write_Regnx(reg, length, buf);
+
+  reg = 0x0b;
+  length = 1;
+  buf[0] = 0x10;
+  // dm_wr_reg(usb_handle, reg, length, buf);
+  DM9051_Write_Regnx(reg, length, buf);
+
+  // wait_phy_end();
+  if (wait_phy_end() < 0)
+  {
+    return -1;
+  }
+
+  return (0);
+}
+
+/*************************************************************************/
 /*      read  EEPROM ------ E-Fuse                                       */
 /*************************************************************************/
-int dm9051a_rd_eep(unsigned char num)
+int dm9051a_rd_eep(unsigned char addr)
 {
   unsigned char valx;
   unsigned int datax;
@@ -53,7 +111,7 @@ int dm9051a_rd_eep(unsigned char num)
   unsigned short length;
   unsigned char buf[SZBUF];
 
-  valx = 0x00 | num;
+  valx = 0x00 | addr;
   reg = 0x0c; // DM9051_EPAR
   length = 1;
   buf[0] = valx;
@@ -96,6 +154,83 @@ int dm9051a_rd_eep(unsigned char num)
 }
 
 /*************************************************************************/
+/*      write e-fuse data (MAC Address)                                   */
+/*************************************************************************/
+void dm9051a_wr_e_fuse(unsigned int addr, unsigned int wdata)
+{
+  unsigned int datax;
+  unsigned char reg;
+  unsigned short length;
+  unsigned char buf[SZBUF];
+  unsigned char reg_num;
+  // unsigned int addr, wdata;
+
+  // printf("e-fuse addr:");
+  // scanf("%x", &addr);
+  // printf("e-fuse data:");
+  // scanf("%x", &wdata);
+
+  // Power on e-fuse, write enable, power down phy chip
+  // reg = 0x1f; length=1;
+  // buf[0]=0x01;
+  // dm_wr_reg(usb_handle, reg, length, buf);
+
+  reg = 0x58;
+  length = 1;
+  buf[0] = 0x88;
+  // dm_wr_reg(usb_handle, reg, length, buf);
+  DM9051_Write_Regnx(reg, length, buf);
+
+  reg_num = addr & 0xff;
+  // wr_eep(reg_num, wdata);
+  dm9051a_wr_eep(reg_num, wdata);
+
+  reg = 0x58;
+  length = 1;
+  buf[0] = 0x80;
+  // dm_wr_reg(usb_handle, reg, length, buf);
+  DM9051_Write_Regnx(reg, length, buf);
+
+  // datax = rd_eep(reg_num);
+  datax = dm9051a_rd_eep(reg_num);
+
+  printf("e-fuse[%X] = %04X \r\n", addr, datax);
+
+#if 0
+  reg = 0x58; length=1;
+  buf[0]=0x00;
+  dm_wr_reg(usb_handle, reg, length, buf);
+#endif
+
+  // Power off e-fuse, write disable, power up phy chip
+  // reg = 0x1f; length=1;
+  // buf[0]=0x00;
+  // dm_wr_reg(usb_handle, reg, length, buf);
+}
+
+/*************************************************************************/
+/*      read e-fuse data one word                                        */
+/*************************************************************************/
+void dm9051a_rd_e_fuse(unsigned char addr)
+{
+  unsigned int datax;
+  unsigned char reg;
+  unsigned short length;
+  unsigned char buf[SZBUF];
+
+  reg = 0x58;
+  length = 1;
+  buf[0] = 0x80;
+  // dm_wr_reg(usb_handle, reg, length, buf);
+  DM9051_Write_Regnx(reg, length, buf);
+
+  // datax = rd_eep(reg_num);
+  datax = dm9051a_rd_eep(addr);
+
+  printf("e-fuse[%X] = %04X \r\n", addr, datax);
+}
+
+/*************************************************************************/
 /*      read e-fuse data (MAC Address)                                   */
 /*************************************************************************/
 void dm9051a_show_e_fuse()
@@ -128,11 +263,48 @@ void dm9051a_show_e_fuse()
 }
 
 /*************************************************************************/
+/*      write e-fuse data (MAC Address)                                   */
+/*************************************************************************/
+void dm9051a_write_e_fuse_all(uint8_t *data, uint8_t len)
+{
+  unsigned int datax;
+  unsigned char reg;
+  unsigned short length;
+  unsigned char buf[SZBUF];
+  unsigned char reg_num;
+
+  reg = 0x58;
+  length = 1;
+  buf[0] = 0x88;
+  // dm_wr_reg(usb_handle, reg, length, buf);
+  DM9051_Write_Regnx(reg, length, buf);
+
+  // data size bytes = 24, words = 12 (2 bytes per word)
+  // byte 轉 word 長度計算
+  // length = sizeof(data) / sizeof(uint16_t);
+  for (int i = 0; i < (len / 2); i++)
+  {
+    dm9051a_wr_eep(i, *(uint16_t *)data);
+    data += 2;
+  }
+
+  // reg = 0x58;
+  // length = 1;
+  // buf[0] = 0x80;
+  // // dm_wr_reg(usb_handle, reg, length, buf);
+  // DM9051_Write_Regnx(reg, length, buf);
+
+  // datax = dm9051a_rd_eep(reg_num);
+
+  // printf("e-fuse[%X] = %04X \r\n", reg_num, datax);
+}
+
+/*************************************************************************/
 /*   show chip status                                                    */
 /*************************************************************************/
 void dm9051a_show_status()
 {
-  unsigned char reg;
+  // unsigned char reg;
   // unsigned short length;
   unsigned char buf[SZBUF];
 
@@ -180,7 +352,7 @@ void dm9051a_show_status()
 
   // MAC address = 0x00:0x60:0x6e:0x55:0x01:0x25  // original
   // Physical Address Registers (PARs) 0x10~0x15
-  reg = 0x10;
+  // reg = 0x10;
   // length = 6;
   DM9051_Read_Regnx(DM9051_PAR, 6, buf);
   printf(": REG10~15=");
@@ -198,7 +370,7 @@ void dm9051a_show_status()
   const uint8_t MACaddr[6] = {0xF0, 0x60, 0xFE, 0xF5, 0xF1, 0xF5};
   // const uint8_t MACaddr[6] = {0x00, 0x60, 0x6e, 0x55, 0x01, 0x25};
   // Physical Address Registers (PARs) 0x10~0x15
-  reg = 0x10;
+  // reg = 0x10;
   DM9051_Write_Regnx(DM9051_PAR, 6, (uint8_t *)MACaddr);
 
   // Physical Address Registers (PARs) 0x10~0x15
