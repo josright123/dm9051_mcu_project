@@ -9,6 +9,7 @@ extern "C"
 #define SZBUF 100
 
   void dm9051a_show_status(void);
+  void dm9051a_show_e_fuse(void);
 
 #ifdef __cplusplus
 }

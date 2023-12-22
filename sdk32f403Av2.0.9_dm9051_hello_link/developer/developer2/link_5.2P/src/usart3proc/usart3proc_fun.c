@@ -258,6 +258,7 @@ void usart3proc_rx_data_interrupt(uint8_t rx_data)
 
     // test dm9051a show_status
     dm9051a_show_status();
+    dm9051a_show_e_fuse();
 
     usart3_rx_counter = 0;
     usart3_rx_complete_status = USART3_RX_COMPLETE_OK;
