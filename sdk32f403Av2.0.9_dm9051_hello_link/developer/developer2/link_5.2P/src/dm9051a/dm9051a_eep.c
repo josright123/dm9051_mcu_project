@@ -156,7 +156,7 @@ int dm9051a_rd_eep(unsigned char addr)
 /*************************************************************************/
 /*      write e-fuse data (MAC Address)                                   */
 /*************************************************************************/
-void dm9051a_wr_e_fuse(unsigned int addr, unsigned int wdata)
+uint16_t dm9051a_wr_e_fuse(unsigned int addr, unsigned int wdata)
 {
   unsigned int datax;
   unsigned char reg;
@@ -185,6 +185,7 @@ void dm9051a_wr_e_fuse(unsigned int addr, unsigned int wdata)
   // wr_eep(reg_num, wdata);
   dm9051a_wr_eep(reg_num, wdata);
 
+  delay_ms(3);
   reg = 0x58;
   length = 1;
   buf[0] = 0x80;
@@ -206,6 +207,7 @@ void dm9051a_wr_e_fuse(unsigned int addr, unsigned int wdata)
   // reg = 0x1f; length=1;
   // buf[0]=0x00;
   // dm_wr_reg(usb_handle, reg, length, buf);
+  return datax;
 }
 
 /*************************************************************************/
@@ -228,6 +230,36 @@ void dm9051a_rd_e_fuse(unsigned char addr)
   datax = dm9051a_rd_eep(addr);
 
   printf("e-fuse[%X] = %04X \r\n", addr, datax);
+}
+
+/*************************************************************************/
+/*      read e-fuse data N bytes                                       */
+/*************************************************************************/
+void dm9051a_rd_e_fuse_nbytes(uint8_t start_addr, uint8_t length, uint8_t *buf)
+{
+  unsigned int datax;
+  unsigned char reg;
+  unsigned char write_buf[2];
+
+  reg = 0x58;
+  write_buf[0] = 0x80;
+  DM9051_Write_Regnx(reg, 1, write_buf);
+
+  // bytes to words conversion for length
+  for (uint8_t i = 0; i < length / 2; i++)
+  {
+    uint8_t addr = start_addr + i;
+    datax = dm9051a_rd_eep(addr);
+    buf[i * 2] = (uint8_t)(datax & 0xFF);
+    buf[i * 2 + 1] = (uint8_t)((datax >> 8) & 0xFF);
+    printf("e-fuse[%X] = %04X \r\n", addr, datax);
+  }
+
+#if 0
+  reg = 0x58; length=1;
+  buf[0]=0x00;
+  dm_wr_reg(usb_handle, reg, length, buf);
+#endif
 }
 
 /*************************************************************************/
@@ -265,38 +297,67 @@ void dm9051a_show_e_fuse()
 /*************************************************************************/
 /*      write e-fuse data (MAC Address)                                   */
 /*************************************************************************/
-void dm9051a_write_e_fuse_all(uint8_t *data, uint8_t len)
+// void dm9051a_write_e_fuse_all(uint8_t *data, uint8_t len)
+// {
+//   unsigned int datax;
+//   unsigned char reg;
+//   unsigned short length;
+//   unsigned char buf[SZBUF];
+//   unsigned char reg_num;
+
+//   reg = 0x58;
+//   length = 1;
+//   buf[0] = 0x88;
+//   // dm_wr_reg(usb_handle, reg, length, buf);
+//   DM9051_Write_Regnx(reg, length, buf);
+
+//   // data size bytes = 24, words = 12 (2 bytes per word)
+//   // byte 轉 word 長度計算
+//   // length = sizeof(data) / sizeof(uint16_t);
+//   for (int i = 0; i < (len / 2); i++)
+//   {
+//     dm9051a_wr_eep(i, *(uint16_t *)data);
+//     data += 2;
+//   }
+
+//   // reg = 0x58;
+//   // length = 1;
+//   // buf[0] = 0x80;
+//   // // dm_wr_reg(usb_handle, reg, length, buf);
+//   // DM9051_Write_Regnx(reg, length, buf);
+
+//   // datax = dm9051a_rd_eep(reg_num);
+
+//   // printf("e-fuse[%X] = %04X \r\n", reg_num, datax);
+// }
+
+/*************************************************************************/
+/*      write e-fuse data N bytes                                        */
+/*************************************************************************/
+// 以2的倍數寫入 e-fuse, start_addr = 0x00, length = 24
+int8_t dm9051a_write_e_fuse_nbytes(uint8_t start_addr, uint8_t length, uint8_t *buf)
 {
-  unsigned int datax;
-  unsigned char reg;
-  unsigned short length;
-  unsigned char buf[SZBUF];
-  unsigned char reg_num;
+  unsigned char reg = 0x58;
+  unsigned char write_buf[SZBUF];
 
-  reg = 0x58;
-  length = 1;
-  buf[0] = 0x88;
-  // dm_wr_reg(usb_handle, reg, length, buf);
-  DM9051_Write_Regnx(reg, length, buf);
+  write_buf[0] = 0x88;
+  DM9051_Write_Regnx(reg, 1, write_buf);
 
-  // data size bytes = 24, words = 12 (2 bytes per word)
-  // byte 轉 word 長度計算
-  // length = sizeof(data) / sizeof(uint16_t);
-  for (int i = 0; i < (len / 2); i++)
+  for (int i = 0; i < (length / 2); i++)
   {
-    dm9051a_wr_eep(i, *(uint16_t *)data);
-    data += 2;
+    // dm9051a_wr_eep(start_addr + i, *(uint16_t *)(buf + i * 2));
+    printf("e-fuse[%02X] = %04X \r\n", start_addr + i, *(uint16_t *)(buf + i * 2));
+    if (dm9051a_wr_eep(start_addr + i, *(uint16_t *)(buf + (i * 2))) < 0)
+    {
+      printf("EEPROM write error!\r\n");
+      return -1;
+    }
   }
-
-  // reg = 0x58;
-  // length = 1;
-  // buf[0] = 0x80;
-  // // dm_wr_reg(usb_handle, reg, length, buf);
-  // DM9051_Write_Regnx(reg, length, buf);
-
-  // datax = dm9051a_rd_eep(reg_num);
-
-  // printf("e-fuse[%X] = %04X \r\n", reg_num, datax);
+  // delay_ms(3);
+  // memset(buf, 0, length);
+  // // read back to verify the data written to EEPROM is correct.
+  // dm9051a_rd_e_fuse_nbytes(start_addr, length, buf);
+  return 0;
 }
 
 /*************************************************************************/

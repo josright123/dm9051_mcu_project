@@ -288,6 +288,8 @@ int usart3proc_main(void)
   uint16_t data_crc16;
   uint16_t calculated_crc;
   uint16_t length;
+  uint8_t buf[SZBUF];
+  uint8_t ret;
 
   // USART3_PROTOCOL_DATA protocolData;
   P_USART3_PROTOCOL_DATA pProtocolData = (P_USART3_PROTOCOL_DATA)usart3_data_buffer;
@@ -324,6 +326,8 @@ int usart3proc_main(void)
         // CRC16 is correct, process the data
         usart3_tx_length = usart3_data_buffer_length;
         memcpy((void *)&usart3_tx_buffer, (void *)&usart3_data_buffer, usart3_data_buffer_length);
+        usart3_tx_buffer[3] = ((usart3_tx_buffer[3] & 0x0F) | ((usart3_tx_buffer[3] & 0xF0) ^ 0xF0));
+
         usart_interrupt_enable(USART3, USART_TDBE_INT, TRUE);
 
         // length = sizeof(usart3_tx_buffer) / sizeof(uint16_t);
@@ -335,7 +339,7 @@ int usart3proc_main(void)
         // test dm9051a show_status
         printf(": dm9051a_show_status...\r\n");
         dm9051a_show_status();
-        dm9051a_show_e_fuse();
+        // dm9051a_show_e_fuse();
 
         // Test e-fuse read
         printf(": dm9051a_rd_e_fuse...\r\n");
@@ -344,13 +348,61 @@ int usart3proc_main(void)
         dm9051a_rd_e_fuse(2);
         dm9051a_rd_e_fuse(3);
 
+        printf(": dm9051a_rd_e_fuse_nbytes...\r\n");
+        dm9051a_rd_e_fuse_nbytes(0, 24, buf);
+        // printf buf for loop
+        for (int i = 0; i < 24; i++)
+        {
+          printf("%02X ", buf[i]);
+        }
+        printf("\r\n");
+
+        printf(": dm9051a_rd_e_fuse_nbytes...\r\n");
+        dm9051a_rd_e_fuse_nbytes(0, 24, buf);
+        // printf buf for loop
+        for (int i = 0; i < 24; i++)
+        {
+          printf("%02X ", buf[i]);
+        }
+        printf("\r\n");
+
         // Test e-fuse write
         printf(": dm9051a_wr_e_fuse...\r\n");
-        dm9051a_wr_e_fuse(0, 0x5555);
-        dm9051a_wr_e_fuse(1, 0xAAAA);
-        dm9051a_wr_e_fuse(2, 0x5555);
-        dm9051a_wr_e_fuse(3, 0xAAAA);
+        dm9051a_wr_e_fuse(0, 0x1234);
+        dm9051a_wr_e_fuse(1, 0x5678);
+        dm9051a_wr_e_fuse(2, 0x2389);
+        dm9051a_wr_e_fuse(3, 0x6542);
 
+        // test buf data 24 bytes write to e-fuse
+        // buf[0] = 0x5A;
+        // buf[1] = 0x5B;
+        // buf[2] = 0x66;
+        // buf[3] = 0xA5;
+        // buf[4] = 0xB5;
+        // buf[5] = 0xAA;
+
+        uint8_t buf2[24] = {0x5A, 0x5B, 0x85, 0xA5, 0xB5, 0xAA, 0x5A, 0x5B, 0x66, 0xA5, 0xB5, 0xAA, 0x5A, 0x5B, 0xCC, 0xA5, 0xB5, 0xAA, 0x5A, 0x5B, 0x33, 0xA5, 0xB5, 0xAA};
+
+        printf(": dm9051a_wr_e_fuse_nbytes...\r\n");
+        // dm9051a_write_e_fuse_nbytes(0, 24, buf);
+        ret = dm9051a_write_e_fuse_nbytes(0, 24, buf2);
+        if (ret == 0)
+        {
+          printf(": dm9051a_write_e_fuse_nbytes OK...\r\n");
+        }
+        else
+        {
+          printf(": dm9051a_write_e_fuse_nbytes ERROR...\r\n");
+        }
+
+        printf(": dm9051a_rd_e_fuse_nbytes...\r\n");
+        dm9051a_rd_e_fuse_nbytes(0, 24, buf);
+        // printf buf for loop
+        for (int i = 0; i < 24; i++)
+        {
+          printf("%02X ", buf[i]);
+        }
+        printf("\r\n");
         // printf(": calculated_crc OK...\r\n");
         printf(": USART3_RX_COMPLETE_OK...\r\n");
       }

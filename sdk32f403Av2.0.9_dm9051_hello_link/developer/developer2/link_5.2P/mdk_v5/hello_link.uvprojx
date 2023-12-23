@@ -446,6 +446,11 @@
               <FileType>1</FileType>
               <FilePath>..\src\usart3proc\usart3proc_fun.c</FilePath>
             </File>
+            <File>
+              <FileName>dm9051a_eep.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\dm9051a\dm9051a_eep.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
