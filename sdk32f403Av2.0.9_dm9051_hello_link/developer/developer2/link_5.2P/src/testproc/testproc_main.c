@@ -1,3 +1,4 @@
+#include <stdlib.h>         // for malloc and free
 #include "dm9051_lw.h"      //#include "dm9051opts.h"
 #include "dm9051_lw_conf.h" //#include "dm9051_lw_decl.h"
 #include "dm9051_lw_testproc_type.h"
@@ -297,23 +298,45 @@ void sys_timeout_debug(uint32_t msecs, sys_timeout_handler handler, void *arg, c
 
 struct sys_timeo mempfixed_desc_tab; // Global.
 
+// void *memp_malloc(memp_t type)
+// {
+//   void *memp;
+//   memp = &mempfixed_desc_tab;
+// #if 0
+//   memp = do_memp_malloc_pool(memp_pools[type]); //type = 'MEMP_SYS_TIMEOUT'
+// #endif
+//   return memp;
+// }
+
+// void memp_free(memp_t type, void *mem)
+// {
+//   if (mem == NULL)
+//     return;
+// #if 0
+//   do_memp_free_pool(memp_pools[type], mem);
+// #endif
+// }
+
 void *memp_malloc(memp_t type)
 {
-  void *memp;
-  memp = &mempfixed_desc_tab;
-#if 0
-  memp = do_memp_malloc_pool(memp_pools[type]); //type = 'MEMP_SYS_TIMEOUT'
-#endif
+  struct sys_timeo *memp = malloc(sizeof(struct sys_timeo));
+  if (memp == NULL)
+  {
+    // handle error here, e.g., return NULL or exit program
+    printf("Erroe: memp_malloc, pool MEMP_SYS_TIMEOUT is empty~\r\n");
+  }
+
+  // do something with memp based on the value of type
+
   return memp;
 }
 
 void memp_free(memp_t type, void *mem)
 {
-  if (mem == NULL)
-    return;
-#if 0
-  do_memp_free_pool(memp_pools[type], mem);
-#endif
+  if (mem != NULL)
+  {
+    free(mem);
+  }
 }
 
 void phy_link_timer(void *arg)
@@ -373,15 +396,32 @@ void linkup_cb(net_t *net, void *arg, uint8_t status)
 //   sys_timeout(MQTT_CLIENT_LINK_TMR_MS, phy_link_timer, net);
 // }
 
-void netlink_init(void) // (are to phase-in, NOW start API-skelton.)
+// void netlink_init(void) // (are to phase-in, NOW start API-skelton.)
+// {
+//   // net_new_task(&__net_instance, linkup_cb, NULL);
+//   __net_instance.link_state = NET_LINK_DOWN;
+//   __net_instance.cbf = linkup_cb;
+//   __net_instance.net_arg = NULL;
+//   /* Start cyclic link_handle timer */
+// #if 1
+//   sys_timeout(MQTT_CLIENT_LINK_TMR_MS, phy_link_timer, &__net_instance); //(no sys_untimeout(), THIS IS FOREEVER LOOP CYCLE, such as 'link_handle()')
+// #endif
+// }
+
+static void net_new_task(net_t *net, net_link_cb_t cb, void *arg)
 {
-  // net_new_task(&__net_instance, linkup_cb, NULL);
-  __net_instance.link_state = NET_LINK_DOWN;
-  __net_instance.cbf = linkup_cb;
-  __net_instance.net_arg = NULL;
+  net->link_state = NET_LINK_DOWN;
+  net->cbf = cb;
+  net->net_arg = arg;
+  sys_timeout(MQTT_CLIENT_LINK_TMR_MS, phy_link_timer, net);
+}
+
+void netlink_init(void)
+{
+  net_new_task(&__net_instance, linkup_cb, NULL);
   /* Start cyclic link_handle timer */
-#if 1
-  sys_timeout(MQTT_CLIENT_LINK_TMR_MS, phy_link_timer, &__net_instance); //(no sys_untimeout(), THIS IS FOREEVER LOOP CYCLE, such as 'link_handle()')
+#if 0
+  sys_timeout(MQTT_CLIENT_LINK_TMR_MS, phy_link_timer, &__net_instance);
 #endif
 }
 
@@ -497,8 +537,9 @@ void testproc_run(void)
 {
   // at32_dm9051_tmr_init(); //dm9051_tmr_init(); //old: env_dm9051_tmr_init()
   // printf(":  while(1);\r\n"); //since followed by a empty-while-loop.
-  usart3proc_init();
+
   netlink_init();
+  usart3proc_init();
 
 #if 1
   at32_dm9051_tmr_init(); // dm9051_tmr_init(); //old: env_dm9051_tmr_init()
