@@ -103,7 +103,7 @@ int dm9051a_wr_eep(unsigned char addr, unsigned int wdata)
 /*************************************************************************/
 /*      read  EEPROM ------ E-Fuse                                       */
 /*************************************************************************/
-int dm9051a_rd_eep(unsigned char addr)
+uint16_t dm9051a_rd_eep(unsigned char addr)
 {
   unsigned char valx;
   unsigned int datax;
@@ -235,7 +235,7 @@ void dm9051a_rd_e_fuse(unsigned char addr)
 /*************************************************************************/
 /*      read e-fuse data N bytes                                       */
 /*************************************************************************/
-void dm9051a_rd_e_fuse_nbytes(uint8_t start_addr, uint8_t length, uint8_t *buf)
+void dm9051a_read_e_fuse_nbytes(uint8_t start_addr, uint8_t length, uint8_t *buf)
 {
   unsigned int datax;
   unsigned char reg;
@@ -334,13 +334,13 @@ void dm9051a_show_e_fuse()
 /*************************************************************************/
 /*      write e-fuse data N bytes                                        */
 /*************************************************************************/
-// 以2的倍數寫入 e-fuse, start_addr = 0x00, length = 24
+// 以2的倍數(word)寫入 e-fuse, start_addr = 0x00, length = 24
 int8_t dm9051a_write_e_fuse_nbytes(uint8_t start_addr, uint8_t length, uint8_t *buf)
 {
-  unsigned char reg = 0x58;
   unsigned char write_buf[SZBUF];
-
+  unsigned char reg = 0x58;
   write_buf[0] = 0x88;
+  // DM9051_Write_Regnx(reg, length, write_buf);
   DM9051_Write_Regnx(reg, 1, write_buf);
 
   for (int i = 0; i < (length / 2); i++)
@@ -352,11 +352,12 @@ int8_t dm9051a_write_e_fuse_nbytes(uint8_t start_addr, uint8_t length, uint8_t *
       printf("EEPROM write error!\r\n");
       return -1;
     }
+    delay_ms(3);
   }
   // delay_ms(3);
   // memset(buf, 0, length);
   // // read back to verify the data written to EEPROM is correct.
-  // dm9051a_rd_e_fuse_nbytes(start_addr, length, buf);
+  // dm9051a_read_e_fuse_nbytes(start_addr, length, buf);
   return 0;
 }
 

@@ -348,17 +348,8 @@ int usart3proc_main(void)
         dm9051a_rd_e_fuse(2);
         dm9051a_rd_e_fuse(3);
 
-        printf(": dm9051a_rd_e_fuse_nbytes...\r\n");
-        dm9051a_rd_e_fuse_nbytes(0, 24, buf);
-        // printf buf for loop
-        for (int i = 0; i < 24; i++)
-        {
-          printf("%02X ", buf[i]);
-        }
-        printf("\r\n");
-
-        printf(": dm9051a_rd_e_fuse_nbytes...\r\n");
-        dm9051a_rd_e_fuse_nbytes(0, 24, buf);
+        printf(": dm9051a_read_e_fuse_nbytes...\r\n");
+        dm9051a_read_e_fuse_nbytes(0, 24, buf);
         // printf buf for loop
         for (int i = 0; i < 24; i++)
         {
@@ -367,23 +358,32 @@ int usart3proc_main(void)
         printf("\r\n");
 
         // Test e-fuse write
-        printf(": dm9051a_wr_e_fuse...\r\n");
+        printf(": dm9051a_wr_e_fuse()...\r\n");
         dm9051a_wr_e_fuse(0, 0x1234);
         dm9051a_wr_e_fuse(1, 0x5678);
         dm9051a_wr_e_fuse(2, 0x2389);
         dm9051a_wr_e_fuse(3, 0x6542);
+        dm9051a_wr_e_fuse(4, 0x1234);
+        dm9051a_wr_e_fuse(5, 0x5678);
+        dm9051a_wr_e_fuse(6, 0x2389);
+        dm9051a_wr_e_fuse(7, 0x6542);
+        dm9051a_wr_e_fuse(8, 0x1234);
+        dm9051a_wr_e_fuse(9, 0x5678);
+        dm9051a_wr_e_fuse(10, 0x2389);
+        dm9051a_wr_e_fuse(11, 0x6542);
 
-        // test buf data 24 bytes write to e-fuse
-        // buf[0] = 0x5A;
-        // buf[1] = 0x5B;
-        // buf[2] = 0x66;
-        // buf[3] = 0xA5;
-        // buf[4] = 0xB5;
-        // buf[5] = 0xAA;
+        printf(": dm9051a_read_e_fuse_nbytes()...\r\n");
+        dm9051a_read_e_fuse_nbytes(0, 24, buf);
+        // printf buf for loop
+        for (int i = 0; i < 24; i++)
+        {
+          printf("%02X ", buf[i]);
+        }
+        printf("\r\n");
 
         uint8_t buf2[24] = {0x5A, 0x5B, 0x85, 0xA5, 0xB5, 0xAA, 0x5A, 0x5B, 0x66, 0xA5, 0xB5, 0xAA, 0x5A, 0x5B, 0xCC, 0xA5, 0xB5, 0xAA, 0x5A, 0x5B, 0x33, 0xA5, 0xB5, 0xAA};
 
-        printf(": dm9051a_wr_e_fuse_nbytes...\r\n");
+        printf(": dm9051a_write_e_fuse_nbytes...\r\n");
         // dm9051a_write_e_fuse_nbytes(0, 24, buf);
         ret = dm9051a_write_e_fuse_nbytes(0, 24, buf2);
         if (ret == 0)
@@ -395,8 +395,8 @@ int usart3proc_main(void)
           printf(": dm9051a_write_e_fuse_nbytes ERROR...\r\n");
         }
 
-        printf(": dm9051a_rd_e_fuse_nbytes...\r\n");
-        dm9051a_rd_e_fuse_nbytes(0, 24, buf);
+        printf(": dm9051a_read_e_fuse_nbytes...\r\n");
+        dm9051a_read_e_fuse_nbytes(0, 24, buf);
         // printf buf for loop
         for (int i = 0; i < 24; i++)
         {
