@@ -39,7 +39,7 @@
  * @{
  */
 
-static uint32_t current_timeout_due_time;
+static uint32_t usart3_current_timeout_due_time;
 
 uint8_t usart3_tx_buffer[USART3_TX_BUFFER_SIZE];
 uint8_t usart3_rx_buffer[USART3_RX_BUFFER_SIZE];
@@ -182,7 +182,7 @@ void usart3proc_time_event(int ms)
 {
   // timeout reset the rx counter.
   // if (usart3_rx_counter > 0 && usart3_rx_counter < USART3_RX_BUFFER_SIZE && ms > 1000)
-  if (usart3_rx_counter > 0 && usart3_rx_counter < USART3_RX_BUFFER_SIZE && sys_now() > current_timeout_due_time)
+  if (usart3_rx_counter > 0 && usart3_rx_counter < USART3_RX_BUFFER_SIZE && sys_now() > usart3_current_timeout_due_time)
   {
     usart3_rx_counter = 0;
     usart3_rx_complete_status = USART3_RX_COMPLETE_TIMEOUT;
@@ -219,7 +219,7 @@ void usart3proc_rx_data_interrupt(uint8_t rx_data)
   // If this is the first byte we are receiving, set the timeout due time
   if (usart3_rx_counter == 0)
   {
-    current_timeout_due_time = sys_now() + 1000; // Set the due time to 1 second from now
+    usart3_current_timeout_due_time = sys_now() + 1000; // Set the due time to 1 second from now
   }
 
   // Store the received byte in the buffer
