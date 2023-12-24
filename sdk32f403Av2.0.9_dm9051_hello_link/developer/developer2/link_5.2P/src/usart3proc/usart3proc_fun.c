@@ -30,6 +30,7 @@
 #include "usart3proc_fun.h"
 // "dm9051a_eep.h"
 #include "../dm9051a/dm9051a_eep.h"
+#include "../ledproc/ledproc.h"
 
 /** @addtogroup AT32F403A_periph_examples
  * @{
@@ -55,17 +56,9 @@ static uint8_t m_uiMachineState;
 
 // usart3_rx 接收資料完成標誌
 // typedef enum usart3_rx_complete_flag ,ok = 1, error = 0, timeout = 2
-typedef enum
-{
-  USART3_RX_COMPLETE_NONE = 0,
-  USART3_RX_COMPLETE_OK = 1,
-  USART3_RX_COMPLETE_ERROR = 2,
-  USART3_RX_COMPLETE_TIMEOUT = 3,
-  // crc16 error
-  USART3_RX_COMPLETE_CRC16_ERROR = 4,
-} usart3_rx_complete_flag;
 
 usart3_rx_complete_flag usart3_rx_complete_status = USART3_RX_COMPLETE_NONE;
+led_status_flag_t led_status_flag = LED_STATUS_NONE;
 
 /**
  * @brief  config usart
@@ -334,7 +327,7 @@ int usart3proc_main(void)
         // printf(": usart3_tx_buffer length: %d \r\n", length);
 
         //      usart3_rx_counter = 0;
-        at32_led_toggle(LED2);
+        // at32_led_toggle(LED2);
 
         // test dm9051a show_status
         printf(": dm9051a_show_status...\r\n");
@@ -404,6 +397,7 @@ int usart3proc_main(void)
         }
         printf("\r\n");
         // printf(": calculated_crc OK...\r\n");
+        led_status_flag = LED_STATUS_OK;
         printf(": USART3_RX_COMPLETE_OK...\r\n");
       }
       else
@@ -423,26 +417,29 @@ int usart3proc_main(void)
     case USART3_RX_COMPLETE_ERROR:
       // usart3_rx_complete_status = USART3_RX_COMPLETE_NONE;
       // at32_led_toggle(LED2);
-      at32_led_toggle(LED3);
-      delay_ms(200);
+      // at32_led_toggle(LED3);
+      // delay_ms(200);
+      led_status_flag = LED_STATUS_ERROR;
       printf(": USART3_RX_COMPLETE_ERROR...\r\n");
       break;
 
     case USART3_RX_COMPLETE_TIMEOUT:
       // usart3_rx_complete_status = USART3_RX_COMPLETE_NONE;
-      at32_led_toggle(LED2);
-      at32_led_toggle(LED3);
-      at32_led_toggle(LED4);
-      delay_ms(500);
+      // at32_led_toggle(LED2);
+      // at32_led_toggle(LED3);
+      // at32_led_toggle(LED4);
+      // delay_ms(500);
+      led_status_flag = LED_STATUS_TIMEOUT;
       printf(": USART3_RX_COMPLETE_TIMEOUT...\r\n");
       break;
 
     case USART3_RX_COMPLETE_CRC16_ERROR:
       // usart3_rx_complete_status = USART3_RX_COMPLETE_NONE;
-      at32_led_toggle(LED2);
-      at32_led_toggle(LED3);
-      at32_led_toggle(LED4);
-      delay_ms(100);
+      // at32_led_toggle(LED2);
+      // at32_led_toggle(LED3);
+      // at32_led_toggle(LED4);
+      // delay_ms(100);
+      led_status_flag = LED_STATUS_CRC16_ERROR;
       printf(": USART3_RX_COMPLETE_CRC16_ERROR...\r\n");
       break;
 

@@ -33,6 +33,26 @@ extern "C"
 
 #define OSMS_WAITTING_RESULT_STATE 30
 
+  typedef enum
+  {
+    USART3_RX_COMPLETE_NONE = 0,
+    USART3_RX_COMPLETE_OK = 1,
+    USART3_RX_COMPLETE_ERROR = 2,
+    USART3_RX_COMPLETE_TIMEOUT = 3,
+    // crc16 error
+    USART3_RX_COMPLETE_CRC16_ERROR = 4,
+  } usart3_rx_complete_flag;
+  extern usart3_rx_complete_flag usart3_rx_complete_status;
+
+  typedef enum
+  {
+    USART3_TX_COMPLETE_NONE = 0,
+    USART3_TX_COMPLETE_OK = 1,
+    USART3_TX_COMPLETE_ERROR = 2,
+    USART3_TX_COMPLETE_TIMEOUT = 3,
+  } usart3_tx_complete_flag;
+  // extern usart3_tx_complete_flag usart3_tx_complete;
+
 #pragma pack(push)
 #pragma pack(1)
   typedef struct

@@ -6,6 +6,7 @@
 #include "tmr_init.h"
 // usart3proc_fun.h
 #include "../usart3proc/usart3proc_fun.h"
+#include "../ledproc/ledproc.h"
 
 int test_line7_enter_check_setup = 0; //.
 
@@ -159,6 +160,8 @@ struct net_s
 };
 
 net_t __net_instance;
+net_t __led_instance;
+
 uint8_t netflags = 0;
 
 void netif_set_link_up(void)
@@ -175,15 +178,16 @@ void netif_set_link_down(void)
 
 #define MQTT_CLIENT_LINK_TMR_MS 200
 
-enum
+// enum
+// {
+//   NET_LINK_DOWN,
+//   NET_LINK_UP
+// };
+typedef enum
 {
-  NET_LINK_DOWN,
-  NET_LINK_UP
-};
-
-//
-// "sys_timeout.c" (memp.c)
-//
+  NET_LINK_DOWN = 0,
+  NET_LINK_UP = 1
+} net_link_status;
 
 /** Create the list of all memory pools managed by memp. MEMP_MAX represents a NULL pool at the end */
 typedef enum
@@ -425,6 +429,128 @@ void netlink_init(void)
 #endif
 }
 
+// *********************************************************************************************************************
+// void led_status_timer(void *arg)
+// {
+//   net_t *net = arg;
+
+//   switch (net->link_state)
+//   {
+//   case LED_STATUS_OK:
+//     // led_toggle(2);
+//     net->link_state = LED_STATUS_OK;
+//     net->cbf(net, net->net_arg, LED_STATUS_OK);
+//     sys_timeout(LED_STATUS_OK_TMR_MS, led_status_timer, net);
+//     break;
+
+//   case LED_STATUS_ERROR:
+//     // led_toggle(3);
+//     net->link_state = LED_STATUS_ERROR;
+//     net->cbf(net, net->net_arg, LED_STATUS_ERROR);
+//     sys_timeout(LED_STATUS_ERROR_TMR_MS, led_status_timer, net);
+//     break;
+
+//   case LED_STATUS_TIMEOUT:
+//     // led_toggle(4);
+//     net->link_state = LED_STATUS_TIMEOUT;
+//     net->cbf(net, net->net_arg, LED_STATUS_TIMEOUT);
+//     sys_timeout(LED_STATUS_TIMEOUT_TMR_MS, led_status_timer, net);
+//     break;
+
+//   case LED_STATUS_CRC16_ERROR:
+//     // led_toggle(3);
+//     net->link_state = LED_STATUS_CRC16_ERROR;
+//     net->cbf(net, net->net_arg, LED_STATUS_CRC16_ERROR);
+//     sys_timeout(LED_STATUS_CRC16_ERROR_TMR_MS, led_status_timer, net);
+//     break;
+
+//   default:
+//     break;
+//   }
+// }
+
+void led_status_timer(void *arg)
+{
+  net_t *net = arg;
+  switch (led_status_flag)
+  {
+  case LED_STATUS_OK:
+    // led_toggle(2);
+    net->link_state = LED_STATUS_OK;
+    net->cbf(net, net->net_arg, LED_STATUS_OK);
+    sys_timeout(LED_STATUS_OK_TMR_MS, led_status_timer, NULL);
+    break;
+
+  case LED_STATUS_ERROR:
+    // led_toggle(3);
+    net->link_state = LED_STATUS_ERROR;
+    net->cbf(net, net->net_arg, LED_STATUS_ERROR);
+    sys_timeout(LED_STATUS_ERROR_TMR_MS, led_status_timer, NULL);
+    break;
+
+  case LED_STATUS_TIMEOUT:
+    // led_toggle(4);
+    net->link_state = LED_STATUS_TIMEOUT;
+    net->cbf(net, net->net_arg, LED_STATUS_TIMEOUT);
+    sys_timeout(LED_STATUS_TIMEOUT_TMR_MS, led_status_timer, NULL);
+    break;
+
+  case LED_STATUS_CRC16_ERROR:
+    // led_toggle(3);
+    net->link_state = LED_STATUS_CRC16_ERROR;
+    net->cbf(net, net->net_arg, LED_STATUS_CRC16_ERROR);
+    sys_timeout(LED_STATUS_CRC16_ERROR_TMR_MS, led_status_timer, NULL);
+    break;
+
+  default:
+    net->link_state = LED_STATUS_NONE;
+    net->cbf(net, net->net_arg, LED_STATUS_NONE);
+    sys_timeout(LED_STATUS_NONE_TMR_MS, led_status_timer, NULL);
+    break;
+  }
+}
+
+void led_status_cb(net_t *net, void *arg, uint8_t status)
+{
+
+  switch (status)
+  {
+  case LED_STATUS_OK:
+    at32_led_toggle(LED2);
+    // printf("led_status_cb led ON\r\n");
+    break;
+
+  case LED_STATUS_ERROR:
+    at32_led_toggle(LED3);
+    break;
+
+  case LED_STATUS_TIMEOUT:
+    at32_led_toggle(LED4);
+    break;
+
+  case LED_STATUS_CRC16_ERROR:
+    at32_led_toggle(LED3);
+    break;
+
+  default:
+    break;
+  }
+}
+
+static void led_new_task(net_t *net, net_link_cb_t cb, void *arg)
+{
+  net->link_state = LED_STATUS_NONE;
+  net->cbf = cb;
+  net->net_arg = arg;
+  // sys_timeout(1000, led_status_timer, net);
+  sys_timeout(LED_STATUS_OK_TMR_MS, led_status_timer, net);
+}
+
+void led_status_init(void)
+{
+  led_new_task(&__led_instance, led_status_cb, NULL);
+}
+
 static uint32_t current_timeout_due_time;
 
 /** Function prototype for a stack-internal timer function that has to be
@@ -539,6 +665,7 @@ void testproc_run(void)
   // printf(":  while(1);\r\n"); //since followed by a empty-while-loop.
 
   netlink_init();
+  led_status_init();
   usart3proc_init();
 
 #if 1
