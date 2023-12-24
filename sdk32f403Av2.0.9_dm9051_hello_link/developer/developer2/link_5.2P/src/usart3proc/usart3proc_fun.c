@@ -415,7 +415,7 @@ int usart3proc_main(void)
       break;
 
     case USART3_RX_COMPLETE_ERROR:
-      // usart3_rx_complete_status = USART3_RX_COMPLETE_NONE;
+      usart3_rx_complete_status = USART3_RX_COMPLETE_NONE;
       // at32_led_toggle(LED2);
       // at32_led_toggle(LED3);
       // delay_ms(200);
@@ -424,7 +424,7 @@ int usart3proc_main(void)
       break;
 
     case USART3_RX_COMPLETE_TIMEOUT:
-      // usart3_rx_complete_status = USART3_RX_COMPLETE_NONE;
+      usart3_rx_complete_status = USART3_RX_COMPLETE_NONE;
       // at32_led_toggle(LED2);
       // at32_led_toggle(LED3);
       // at32_led_toggle(LED4);
@@ -434,7 +434,7 @@ int usart3proc_main(void)
       break;
 
     case USART3_RX_COMPLETE_CRC16_ERROR:
-      // usart3_rx_complete_status = USART3_RX_COMPLETE_NONE;
+      usart3_rx_complete_status = USART3_RX_COMPLETE_NONE;
       // at32_led_toggle(LED2);
       // at32_led_toggle(LED3);
       // at32_led_toggle(LED4);

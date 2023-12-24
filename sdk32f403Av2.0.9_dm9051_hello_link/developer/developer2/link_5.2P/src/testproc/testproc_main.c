@@ -473,39 +473,40 @@ void led_status_timer(void *arg)
 {
   net_t *net = arg;
   switch (led_status_flag)
+  // switch (net->link_state)
   {
   case LED_STATUS_OK:
     // led_toggle(2);
     net->link_state = LED_STATUS_OK;
     net->cbf(net, net->net_arg, LED_STATUS_OK);
-    sys_timeout(LED_STATUS_OK_TMR_MS, led_status_timer, NULL);
+    sys_timeout(LED_STATUS_OK_TMR_MS, led_status_timer, net);
     break;
 
   case LED_STATUS_ERROR:
     // led_toggle(3);
     net->link_state = LED_STATUS_ERROR;
     net->cbf(net, net->net_arg, LED_STATUS_ERROR);
-    sys_timeout(LED_STATUS_ERROR_TMR_MS, led_status_timer, NULL);
+    sys_timeout(LED_STATUS_ERROR_TMR_MS, led_status_timer, net);
     break;
 
   case LED_STATUS_TIMEOUT:
     // led_toggle(4);
     net->link_state = LED_STATUS_TIMEOUT;
     net->cbf(net, net->net_arg, LED_STATUS_TIMEOUT);
-    sys_timeout(LED_STATUS_TIMEOUT_TMR_MS, led_status_timer, NULL);
+    sys_timeout(LED_STATUS_TIMEOUT_TMR_MS, led_status_timer, net);
     break;
 
   case LED_STATUS_CRC16_ERROR:
     // led_toggle(3);
     net->link_state = LED_STATUS_CRC16_ERROR;
     net->cbf(net, net->net_arg, LED_STATUS_CRC16_ERROR);
-    sys_timeout(LED_STATUS_CRC16_ERROR_TMR_MS, led_status_timer, NULL);
+    sys_timeout(LED_STATUS_CRC16_ERROR_TMR_MS, led_status_timer, net);
     break;
 
   default:
     net->link_state = LED_STATUS_NONE;
     net->cbf(net, net->net_arg, LED_STATUS_NONE);
-    sys_timeout(LED_STATUS_NONE_TMR_MS, led_status_timer, NULL);
+    sys_timeout(LED_STATUS_NONE_TMR_MS, led_status_timer, net);
     break;
   }
 }
