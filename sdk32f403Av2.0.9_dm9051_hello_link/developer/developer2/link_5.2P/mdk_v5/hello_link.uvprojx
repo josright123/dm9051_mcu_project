@@ -7,20 +7,20 @@
 
   <Targets>
     <Target>
-      <TargetName>hello9051</TargetName>
+      <TargetName>hello_link_9051</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <TargetOption>
         <TargetCommonOption>
-          <Device>-AT32F403AVCT7</Device>
+          <Device>-AT32F403AVGT7</Device>
           <Vendor>ArteryTek</Vendor>
           <PackID>ArteryTek.AT32F403A_407_DFP.2.1.6</PackID>
-          <Cpu>IROM(0x08000000,0x40000) IRAM(0x20000000,0x38000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
+          <Cpu>IROM(0x08000000,0x100000) IRAM(0x20000000,0x38000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
-          <FlashDriverDll>UL2CM3(-S0 -C0 -P0 -FD20000000 -FC1000 -FN1 -FF0AT32F403A_256 -FS08000000 -FL040000 -FP0($$Device:-AT32F403AVCT7$Flash\AT32F403A_256.FLM))</FlashDriverDll>
+          <FlashDriverDll>UL2CM3(-S0 -C0 -P0 -FD20000000 -FC1000 -FN1 -FF0AT32F403A_1024 -FS08000000 -FL0100000 -FP0($$Device:-AT32F403AVGT7$Flash\AT32F403A_1024.FLM))</FlashDriverDll>
           <DeviceId>0</DeviceId>
-          <RegisterFile>$$Device:-AT32F403AVCT7$Device\Include\at32f403a_407.h</RegisterFile>
+          <RegisterFile>$$Device:-AT32F403AVGT7$Device\Include\at32f403a_407.h</RegisterFile>
           <MemoryEnv></MemoryEnv>
           <Cmp></Cmp>
           <Asm></Asm>
@@ -30,7 +30,7 @@
           <SLE66CMisc></SLE66CMisc>
           <SLE66AMisc></SLE66AMisc>
           <SLE66LinkerMisc></SLE66LinkerMisc>
-          <SFDFile>$$Device:-AT32F403AVCT7$SVD\AT32F403Axx_v2.svd</SFDFile>
+          <SFDFile>$$Device:-AT32F403AVGT7$SVD\AT32F403Axx_v2.svd</SFDFile>
           <bCustSvd>0</bCustSvd>
           <UseEnv>0</UseEnv>
           <BinPath></BinPath>
@@ -46,7 +46,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\objects\</OutputDirectory>
-          <OutputName>hello9051</OutputName>
+          <OutputName>hellol_ink_9051</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>
@@ -210,7 +210,7 @@
             <AdsLsun>1</AdsLsun>
             <AdsLven>1</AdsLven>
             <AdsLsxf>1</AdsLsxf>
-            <RvctClst>0</RvctClst>
+            <RvctClst>1</RvctClst>
             <GenPPlst>0</GenPPlst>
             <AdsCpuType>"Cortex-M4"</AdsCpuType>
             <RvctDeviceName></RvctDeviceName>
@@ -286,7 +286,7 @@
               <IROM>
                 <Type>1</Type>
                 <StartAddress>0x8000000</StartAddress>
-                <Size>0x40000</Size>
+                <Size>0x100000</Size>
               </IROM>
               <XRAM>
                 <Type>0</Type>
@@ -311,7 +311,7 @@
               <OCR_RVCT4>
                 <Type>1</Type>
                 <StartAddress>0x8000000</StartAddress>
-                <Size>0x40000</Size>
+                <Size>0x100000</Size>
               </OCR_RVCT4>
               <OCR_RVCT5>
                 <Type>1</Type>
@@ -360,7 +360,7 @@
             <wLevel>2</wLevel>
             <uThumb>0</uThumb>
             <uSurpInc>0</uSurpInc>
-            <uC99>0</uC99>
+            <uC99>1</uC99>
             <useXO>0</useXO>
             <v6Lang>1</v6Lang>
             <v6LangP>1</v6LangP>
@@ -435,6 +435,21 @@
               <FileName>at32f403a_407_int.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\at32f403a_407_int.c</FilePath>
+            </File>
+            <File>
+              <FileName>tmr_init.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\tmr_init.c</FilePath>
+            </File>
+            <File>
+              <FileName>usart3proc_fun.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\usart3proc\usart3proc_fun.c</FilePath>
+            </File>
+            <File>
+              <FileName>dm9051a_eep.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\dm9051a\dm9051a_eep.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -1,0 +1,12 @@
+{
+  "files.associations": {
+    "*.ts": "typescript",
+    "dm9051_lw_testproc.h": "c",
+    "usart3proc_main.h": "c",
+    "usart3proc_fun.h": "c",
+    "tmr_init.h": "c",
+    "dm9051_lw_testproc_type.h": "c",
+    "dm9051a_eep.h": "c",
+    "ledproc.h": "c"
+  }
+}
