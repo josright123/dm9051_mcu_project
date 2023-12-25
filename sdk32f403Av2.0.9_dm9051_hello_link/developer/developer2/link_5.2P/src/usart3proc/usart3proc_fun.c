@@ -346,7 +346,7 @@ int usart3proc_main(void)
         // printf buf for loop
         for (int i = 0; i < 24; i++)
         {
-          printf("%02X ", buf[i]);
+          printf("%02X ", *(uint16_t *)(buf + i * 2));
         }
         printf("\r\n");
 
@@ -370,7 +370,7 @@ int usart3proc_main(void)
         // printf buf for loop
         for (int i = 0; i < 24; i++)
         {
-          printf("%02X ", buf[i]);
+          printf("%04X ", *(uint16_t *)(buf + i * 2));
         }
         printf("\r\n");
 
@@ -393,7 +393,7 @@ int usart3proc_main(void)
         // printf buf for loop
         for (int i = 0; i < 24; i++)
         {
-          printf("%02X ", buf[i]);
+          printf("%04X ", *(uint16_t *)(buf + i * 2));
         }
         printf("\r\n");
         // printf(": calculated_crc OK...\r\n");

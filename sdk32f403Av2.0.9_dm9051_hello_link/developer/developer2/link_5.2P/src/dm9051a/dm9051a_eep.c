@@ -248,12 +248,14 @@ void dm9051a_read_e_fuse_nbytes(uint8_t start_addr, uint8_t length, uint8_t *buf
   DM9051_Write_Regnx(reg, 1, write_buf);
 
   // bytes to words conversion for length
-  for (uint8_t i = 0; i < length / 2; i++)
+  for (uint8_t i = 0; i < length; i++)
   {
     uint8_t addr = start_addr + i;
     datax = dm9051a_rd_eep(addr);
-    buf[i * 2] = (uint8_t)(datax & 0xFF);
-    buf[i * 2 + 1] = (uint8_t)((datax >> 8) & 0xFF);
+    *(uint16_t *)(buf + i * 2) = datax;
+
+    // buf[i * 2] = (uint8_t)(datax & 0xFF);
+    // buf[i * 2 + 1] = (uint8_t)((datax >> 8) & 0xFF);
     printf("e-fuse[%X] = %04X \r\n", addr, datax);
   }
 
