@@ -342,12 +342,12 @@ int usart3proc_main(void)
         dm9051a_rd_e_fuse(2);
         dm9051a_rd_e_fuse(3);
 
-        printf(": dm9051a_read_e_fuse_nbytes...\r\n");
-        dm9051a_read_e_fuse_nbytes(0, 24, buf);
+        printf(": dm9051a_read_e_fuse_nwords...\r\n");
+        dm9051a_read_e_fuse_nwords(0, 24, buf_word);
         // printf buf for loop
         for (int i = 0; i < 24; i++)
         {
-          printf("%02X ", *(uint16_t *)(buf + i * 2));
+          printf("%04X ", buf_word[i]);
         }
         printf("\r\n");
 
@@ -366,12 +366,12 @@ int usart3proc_main(void)
         dm9051a_wr_e_fuse(10, 0x2389);
         dm9051a_wr_e_fuse(11, 0x6542);
 
-        printf(": dm9051a_read_e_fuse_nbytes()...\r\n");
-        dm9051a_read_e_fuse_nbytes(0, 24, buf);
+        printf(": dm9051a_read_e_fuse_nwords()...\r\n");
+        dm9051a_read_e_fuse_nwords(0, 24, buf_word);
         // printf buf for loop
         for (int i = 0; i < 24; i++)
         {
-          printf("%04X ", *(uint16_t *)(buf + i * 2));
+          printf("%04X ", buf_word[i]);
         }
         printf("\r\n");
 
@@ -391,12 +391,12 @@ int usart3proc_main(void)
           printf(": dm9051a_write_e_fuse_nwords ERROR...\r\n");
         }
 
-        printf(": dm9051a_read_e_fuse_nbytes...\r\n");
-        dm9051a_read_e_fuse_nbytes(0, 24, buf);
+        printf(": dm9051a_read_e_fuse_nwords...\r\n");
+        dm9051a_read_e_fuse_nwords(0, 24, buf_word);
         // printf buf for loop
         for (int i = 0; i < 24; i++)
         {
-          printf("%04X ", *(uint16_t *)(buf + i * 2));
+          printf("%04X ", buf_word[i]);
         }
         printf("\r\n");
         // printf(": calculated_crc OK...\r\n");
