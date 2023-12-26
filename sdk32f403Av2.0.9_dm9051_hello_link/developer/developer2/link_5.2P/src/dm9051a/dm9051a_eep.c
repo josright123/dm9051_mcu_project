@@ -19,9 +19,10 @@ int8_t wait_phy_end()
   loop = 1;
   while (loop)
   {
-    reg = 0x0b;
+    reg = 0x0b; // DM9051_EPCR
     length = 1;
     // dm_rd_reg(usb_handle, reg, length, buf);
+    // EEPROM Access Status or PHY Access Status Register (EPCR) bit 0 = 0, EEPROM operation is complete.
     DM9051_Read_Regnx(reg, length, buf);
     if (buf[0] & 0x01)
     {
@@ -45,57 +46,38 @@ int8_t wait_phy_end()
 /*************************************************************************/
 /*      write EEPROM ------ E-Fuse                                       */
 /*************************************************************************/
-int dm9051a_wr_eep(unsigned char addr, unsigned int wdata)
+int dm9051a_wr_eep(uint8_t addr, uint16_t wdata)
 {
-  unsigned char valx;
-  unsigned char reg;
-  unsigned short length;
-  unsigned char buf[SZBUF];
+  // uint8_t valx;
+  uint8_t reg;
+  uint8_t length;
+  uint8_t buf[SZBUF];
 
-  valx = 0x00 | addr;
-  reg = 0x0c;
+  reg = 0x0c; // DM9051_EPAR
   length = 1;
-  buf[0] = valx;
+  buf[0] = addr;
   // dm_wr_reg(usb_handle, reg, length, buf);
-  DM9051_Write_Regnx(reg, length, buf);
+  DM9051_Write_Regnx(DM9051_EPAR, length, buf);
 
-  valx = wdata & 0xff;
-  reg = 0x0d;
+  reg = 0x0d; // DM9051_EPDRL
+  length = 2;
+  // buf[0] = valx;
+  // dm_wr_reg(usb_handle, reg, length, buf);
+  DM9051_Write_Regnx(reg, length, (uint8_t *)&wdata);
+
+  reg = 0x0b; // DM9051_EPCR
   length = 1;
-  buf[0] = valx;
+  buf[0] = 0x12; // write eeprom enable, write eeprom start
   // dm_wr_reg(usb_handle, reg, length, buf);
-  DM9051_Write_Regnx(reg, length, buf);
+  DM9051_Write_Regnx(DM9051_EPCR, length, buf);
 
-  valx = (wdata >> 8) & 0xff;
-  reg = 0x0e;
+  wait_phy_end();
+
+  reg = 0x0b; // DM9051_EPCR
   length = 1;
-  buf[0] = valx;
+  buf[0] = 0x00; // write eeprom disable
   // dm_wr_reg(usb_handle, reg, length, buf);
-  DM9051_Write_Regnx(reg, length, buf);
-
-  reg = 0x0b;
-  length = 1;
-  buf[0] = 0x10;
-  // dm_wr_reg(usb_handle, reg, length, buf);
-  DM9051_Write_Regnx(reg, length, buf);
-
-  reg = 0x0b;
-  length = 1;
-  buf[0] = 0x12;
-  // dm_wr_reg(usb_handle, reg, length, buf);
-  DM9051_Write_Regnx(reg, length, buf);
-
-  reg = 0x0b;
-  length = 1;
-  buf[0] = 0x10;
-  // dm_wr_reg(usb_handle, reg, length, buf);
-  DM9051_Write_Regnx(reg, length, buf);
-
-  // wait_phy_end();
-  if (wait_phy_end() < 0)
-  {
-    return -1;
-  }
+  DM9051_Write_Regnx(DM9051_EPCR, length, buf);
 
   return (0);
 }
@@ -105,47 +87,43 @@ int dm9051a_wr_eep(unsigned char addr, unsigned int wdata)
 /*************************************************************************/
 uint16_t dm9051a_rd_eep(unsigned char addr)
 {
-  unsigned char valx;
+  // unsigned char valx;
   unsigned int datax;
   unsigned char reg;
   unsigned short length;
   unsigned char buf[SZBUF];
 
-  valx = 0x00 | addr;
+  // valx = 0x00 | addr;
   reg = 0x0c; // DM9051_EPAR
   length = 1;
-  buf[0] = valx;
+  buf[0] = addr;
   // dm_wr_reg(usb_handle, reg, length, buf);
-  DM9051_Write_Regnx(reg, length, buf);
+  DM9051_Write_Regnx(DM9051_EPAR, length, buf);
 
-  reg = 0x0b;
+  // reg = 0x0b;  // DM9051_EPCR
+  // length = 1;
+  // buf[0] = 0x00;
+  // // dm_wr_reg(usb_handle, reg, length, buf);
+  // DM9051_Write_Regnx(DM9051_EPCR, length, buf);
+
+  reg = 0x0b; // DM9051_EPCR
+  length = 1;
+  buf[0] = 0x04; // read eeprom enable
+  // dm_wr_reg(usb_handle, reg, length, buf);
+  DM9051_Write_Regnx(DM9051_EPCR, length, buf);
+
+  wait_phy_end();
+
+  reg = 0x0b; // DM9051_EPCR
   length = 1;
   buf[0] = 0x00;
   // dm_wr_reg(usb_handle, reg, length, buf);
-  DM9051_Write_Regnx(reg, length, buf);
+  DM9051_Write_Regnx(DM9051_EPCR, length, buf);
 
-  reg = 0x0b;
-  length = 1;
-  buf[0] = 0x04;
-  // dm_wr_reg(usb_handle, reg, length, buf);
-  DM9051_Write_Regnx(reg, length, buf);
-
-  reg = 0x0b;
-  length = 1;
-  buf[0] = 0x00;
-  // dm_wr_reg(usb_handle, reg, length, buf);
-  DM9051_Write_Regnx(reg, length, buf);
-
-  // wait_phy_end();
-  if (wait_phy_end() < 0)
-  {
-    return -1;
-  }
-
-  reg = 0x0d;
+  reg = 0x0d; // DM9051_EPDRL
   length = 2;
   // dm_rd_reg(usb_handle, reg, length, buf);
-  DM9051_Read_Regnx(reg, length, buf);
+  DM9051_Read_Regnx(DM9051_EPDRL, length, buf);
   // datax = (buf[1] << 8) + buf[0];
   // *(uint16_t *)buf
   datax = *(uint16_t *)buf;
@@ -185,7 +163,7 @@ uint16_t dm9051a_wr_e_fuse(unsigned int addr, unsigned int wdata)
   // wr_eep(reg_num, wdata);
   dm9051a_wr_eep(reg_num, wdata);
 
-  delay_ms(3);
+  delay_ms(4);
   reg = 0x58;
   length = 1;
   buf[0] = 0x80;
@@ -195,7 +173,7 @@ uint16_t dm9051a_wr_e_fuse(unsigned int addr, unsigned int wdata)
   // datax = rd_eep(reg_num);
   datax = dm9051a_rd_eep(reg_num);
 
-  printf("e-fuse[%X] = %04X \r\n", addr, datax);
+  printf("e-fuse[%02X] = %04X \r\n", addr, datax);
 
 #if 0
   reg = 0x58;
@@ -231,7 +209,7 @@ void dm9051a_rd_e_fuse(unsigned char addr)
   // datax = rd_eep(reg_num);
   datax = dm9051a_rd_eep(addr);
 
-  printf("e-fuse[%X] = %04X \r\n", addr, datax);
+  printf("e-fuse[%02X] = %04X \r\n", addr, datax);
 }
 
 /*************************************************************************/
@@ -256,7 +234,7 @@ void dm9051a_read_e_fuse_nbytes(uint8_t start_addr, uint8_t length, uint8_t *buf
 
     // buf[i * 2] = (uint8_t)(datax & 0xFF);
     // buf[i * 2 + 1] = (uint8_t)((datax >> 8) & 0xFF);
-    printf("e-fuse[%X] = %04X \r\n", addr, datax);
+    printf("e-fuse[%02X] = %04X \r\n", addr, datax);
   }
 
 #if 0
@@ -360,7 +338,7 @@ int8_t dm9051a_write_e_fuse_nbytes(uint8_t start_addr, uint8_t length, uint8_t *
       printf("EEPROM write error!\r\n");
       return -1;
     }
-    delay_ms(3);
+    delay_ms(4);
   }
 
 #if 0
@@ -371,7 +349,7 @@ int8_t dm9051a_write_e_fuse_nbytes(uint8_t start_addr, uint8_t length, uint8_t *
   DM9051_Write_Regnx(reg, 1, buf);
 #endif
 
-  // delay_ms(3);
+  // delay_ms(4);
   // memset(buf, 0, length);
   // // read back to verify the data written to EEPROM is correct.
   // dm9051a_read_e_fuse_nbytes(start_addr, length, buf);
