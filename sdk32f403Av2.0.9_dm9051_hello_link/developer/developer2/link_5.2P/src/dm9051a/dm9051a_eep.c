@@ -46,7 +46,7 @@ int8_t wait_phy_end()
 /*************************************************************************/
 /*      write EEPROM ------ E-Fuse                                       */
 /*************************************************************************/
-int dm9051a_wr_eep(uint8_t addr, uint16_t wdata)
+void dm9051a_wr_eep(uint8_t addr, uint16_t wdata)
 {
   uint8_t reg;
   uint8_t length;
@@ -77,8 +77,6 @@ int dm9051a_wr_eep(uint8_t addr, uint16_t wdata)
   buf[0] = 0x00; // write eeprom disable
   // dm_wr_reg(usb_handle, reg, length, buf);
   DM9051_Write_Regnx(DM9051_EPCR, length, buf);
-
-  return (0);
 }
 
 /*************************************************************************/
@@ -319,18 +317,14 @@ int8_t dm9051a_write_e_fuse_nbytes(uint8_t start_addr, uint8_t length, uint8_t *
   {
     // dm9051a_wr_eep(start_addr + i, *(uint16_t *)(buf + i * 2));
     printf("e-fuse[%02X] = %04X \r\n", start_addr + i, *(uint16_t *)(buf + i * 2));
-    if (dm9051a_wr_eep(start_addr + i, *(uint16_t *)(buf + (i * 2))) < 0)
-    {
-      printf("EEPROM write error!\r\n");
-      return -1;
-    }
+    dm9051a_wr_eep(start_addr + i, *(uint16_t *)(buf + (i * 2)));
     delay_ms(4);
   }
 
-#if 0
+#if 1
   reg = 0x58;
   // length=1;
-  buf[0]=0x00;
+  buf[0] = 0x00;
   // dm_wr_reg(usb_handle, reg, length, buf);
   DM9051_Write_Regnx(reg, 1, buf);
 #endif
@@ -339,6 +333,31 @@ int8_t dm9051a_write_e_fuse_nbytes(uint8_t start_addr, uint8_t length, uint8_t *
   // memset(buf, 0, length);
   // // read back to verify the data written to EEPROM is correct.
   // dm9051a_read_e_fuse_nbytes(start_addr, length, buf);
+  return 0;
+}
+
+/*************************************************************************/
+/*      write e-fuse data N words                                        */
+/*************************************************************************/
+int8_t dm9051a_write_e_fuse_nwords(uint8_t start_addr, uint8_t length, uint16_t *buf)
+{
+  unsigned char write_buf[SZBUF];
+  unsigned char reg = 0x58;
+  write_buf[0] = 0x88;
+  DM9051_Write_Regnx(reg, 1, write_buf);
+
+  for (int i = 0; i < length; i++)
+  {
+    uint16_t data = *(buf + i);
+    printf("e-fuse[%02X] = %04X \r\n", start_addr + i, data);
+    dm9051a_wr_eep(start_addr + i, data);
+    delay_ms(4);
+  }
+
+  reg = 0x58;
+  uint8_t zero = 0x00;
+  DM9051_Write_Regnx(reg, 1, &zero);
+
   return 0;
 }
 

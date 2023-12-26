@@ -282,6 +282,7 @@ int usart3proc_main(void)
   uint16_t calculated_crc;
   uint16_t length;
   uint8_t buf[SZBUF];
+  uint16_t buf_word[SZBUF];
   uint8_t ret;
 
   // USART3_PROTOCOL_DATA protocolData;
@@ -375,18 +376,20 @@ int usart3proc_main(void)
         printf("\r\n");
 
         // uint8_t buf2[24] = {0x5A, 0x5B, 0x85, 0xA5, 0xB5, 0xAA, 0x5A, 0x5B, 0x66, 0xA5, 0xB5, 0xAA, 0x5A, 0x5B, 0xCC, 0xA5, 0xB5, 0xAA, 0x5A, 0x5B, 0x33, 0xA5, 0xB5, 0xAA};
+        // uint16_t buf2[12] = {0x5A5B, 0x85A5, 0xB5AA, 0x5A5B, 0x66A5, 0xB5AA, 0x5A5B, 0xCCA5, 0xB5AA, 0x5A5B, 0x33A5, 0xB5AA};
+        uint16_t buf2[24] = {0x5A50, 0x85A0, 0xB5AA, 0x5A5B, 0x66A5, 0xB5AA, 0x5A5B, 0xCCA5, 0xB5AA, 0x5A5B, 0x33A5, 0xB5AA, 0x5A5B, 0x85A5, 0xB5AA, 0x5A5B, 0x66A5, 0xB5AA, 0x5A5B, 0xCCA5, 0xB5AA, 0x5A5B, 0x33A5, 0xB5AA};
 
-        // printf(": dm9051a_write_e_fuse_nbytes...\r\n");
-        // // dm9051a_write_e_fuse_nbytes(0, 24, buf);
-        // ret = dm9051a_write_e_fuse_nbytes(0, 24, buf2);
-        // if (ret == 0)
-        // {
-        //   printf(": dm9051a_write_e_fuse_nbytes OK...\r\n");
-        // }
-        // else
-        // {
-        //   printf(": dm9051a_write_e_fuse_nbytes ERROR...\r\n");
-        // }
+        printf(": dm9051a_write_e_fuse_nwords()...\r\n");
+        // dm9051a_write_e_fuse_nbytes(0, 24, buf);
+        ret = dm9051a_write_e_fuse_nwords(0, sizeof(buf2) / sizeof(uint16_t), buf2);
+        if (ret == 0)
+        {
+          printf(": dm9051a_write_e_fuse_nwords OK...\r\n");
+        }
+        else
+        {
+          printf(": dm9051a_write_e_fuse_nwords ERROR...\r\n");
+        }
 
         printf(": dm9051a_read_e_fuse_nbytes...\r\n");
         dm9051a_read_e_fuse_nbytes(0, 24, buf);
