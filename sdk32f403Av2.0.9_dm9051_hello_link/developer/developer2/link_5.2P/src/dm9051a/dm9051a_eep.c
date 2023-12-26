@@ -198,9 +198,11 @@ uint16_t dm9051a_wr_e_fuse(unsigned int addr, unsigned int wdata)
   printf("e-fuse[%X] = %04X \r\n", addr, datax);
 
 #if 0
-  reg = 0x58; length=1;
-  buf[0]=0x00;
-  dm_wr_reg(usb_handle, reg, length, buf);
+  reg = 0x58;
+  length = 1;
+  buf[0] = 0x00;
+  // dm_wr_reg(usb_handle, reg, length, buf);
+  DM9051_Write_Regnx(reg, length, buf);
 #endif
 
   // Power off e-fuse, write disable, power up phy chip
@@ -256,9 +258,11 @@ void dm9051a_read_e_fuse_nbytes(uint8_t start_addr, uint8_t length, uint8_t *buf
   }
 
 #if 0
-  reg = 0x58; length=1;
+  reg = 0x58;
+  // length=1;
   buf[0]=0x00;
-  dm_wr_reg(usb_handle, reg, length, buf);
+  // dm_wr_reg(usb_handle, reg, length, buf);
+  DM9051_Write_Regnx(reg, 1, buf);
 #endif
 }
 
@@ -288,9 +292,11 @@ void dm9051a_show_e_fuse()
   }
 
 #if 0
-  reg = 0x58; length=1;
+  reg = 0x58;
+  length=1;
   buf[0]=0x00;
-  dm_wr_reg(usb_handle, reg, length, buf);
+  // dm_wr_reg(usb_handle, reg, length, buf);
+  DM9051_Write_Regnx(reg, 1, buf);
 #endif
 }
 
@@ -354,6 +360,15 @@ int8_t dm9051a_write_e_fuse_nbytes(uint8_t start_addr, uint8_t length, uint8_t *
     }
     delay_ms(3);
   }
+
+#if 0
+  reg = 0x58;
+  // length=1;
+  buf[0]=0x00;
+  // dm_wr_reg(usb_handle, reg, length, buf);
+  DM9051_Write_Regnx(reg, 1, buf);
+#endif
+
   // delay_ms(3);
   // memset(buf, 0, length);
   // // read back to verify the data written to EEPROM is correct.
