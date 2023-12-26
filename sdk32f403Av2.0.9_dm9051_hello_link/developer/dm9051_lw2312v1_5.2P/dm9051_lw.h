@@ -157,6 +157,13 @@
 #define RSR_CE              (1 << 1)
 #define RSR_FOE             (1 << 0)
 
+#define EPCR_REEP           (1<<5)
+#define EPCR_WEP            (1<<4)
+#define EPCR_EPOS           (1<<3)
+#define EPCR_ERPRR          (1<<2)
+#define EPCR_ERPRW          (1<<1)
+#define EPCR_ERRE           (1<<0)
+
 #define INTR_ACTIVE_LOW		(1 << 0)
 
 #define BPTR_DEFAULT		(0x3f)
