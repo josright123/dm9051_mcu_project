@@ -360,7 +360,7 @@
             <wLevel>2</wLevel>
             <uThumb>0</uThumb>
             <uSurpInc>0</uSurpInc>
-            <uC99>0</uC99>
+            <uC99>1</uC99>
             <useXO>0</useXO>
             <v6Lang>1</v6Lang>
             <v6LangP>1</v6LangP>
@@ -442,9 +442,9 @@
               <FilePath>..\src\tmr_init.c</FilePath>
             </File>
             <File>
-              <FileName>usart3proc_main.c</FileName>
+              <FileName>usart3proc_fun.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\usart3proc\usart3proc_main.c</FilePath>
+              <FilePath>..\src\usart3proc\usart3proc_fun.c</FilePath>
             </File>
           </Files>
         </Group>

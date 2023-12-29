@@ -3,8 +3,8 @@
 #include "dm9051_lw_testproc_type.h"
 #include "dm9051_lw_testproc.h"
 #include "tmr_init.h"
-// usart3proc_main.h
-#include "../usart3proc/usart3proc_main.h"
+// usart3proc_fun.h
+#include "../usart3proc/usart3proc_fun.h"
 
 int test_line7_enter_check_setup = 0; //.
 
@@ -337,7 +337,7 @@ void phy_link_timer(void *arg)
       net->cbf(net, net->net_arg, NET_LINK_DOWN);
     }
   }
-
+  usart3proc_time_event(MQTT_CLIENT_LINK_TMR_MS);
 #if 1
   sys_timeout(MQTT_CLIENT_LINK_TMR_MS, phy_link_timer, net);
 #endif
@@ -474,7 +474,7 @@ void sys_check_timeouts(void)
 #if 0  // LWIP_DEBUG_TIMERNAMES
     if (handler != NULL) {
       LWIP_DEBUGF(TIMERS_DEBUG, ("sct calling h=%s t=%"U32_F" arg=%p\n",
-                                 tmptimeout->handler_name, sys_now() - tmptimeout->time, arg));
+      tmptimeout->handler_name, sys_now() - tmptimeout->time, arg));
     }
 #endif /* LWIP_DEBUG_TIMERNAMES */
     memp_free(MEMP_SYS_TIMEOUT, tmptimeout);
@@ -497,9 +497,9 @@ void testproc_run(void)
 {
   // at32_dm9051_tmr_init(); //dm9051_tmr_init(); //old: env_dm9051_tmr_init()
   // printf(":  while(1);\r\n"); //since followed by a empty-while-loop.
-
+  usart3proc_init();
   netlink_init();
-  
+
 #if 1
   at32_dm9051_tmr_init(); // dm9051_tmr_init(); //old: env_dm9051_tmr_init()
   printf(":  Connect Detecting...\r\n");
@@ -509,6 +509,7 @@ void testproc_run(void)
   while (1)
   {
     threads_support();
+    usart3proc_main();
   }
 }
 

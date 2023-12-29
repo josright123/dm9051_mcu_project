@@ -162,6 +162,11 @@
           <WinNumber>1</WinNumber>
           <ItemText>tmptimeout</ItemText>
         </Ww>
+        <Ww>
+          <count>3</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>usart3_rx_buffer</ItemText>
+        </Ww>
       </WatchWindow1>
       <WatchWindow2>
         <Ww>
@@ -305,8 +310,8 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\usart3proc\usart3proc_main.c</PathWithFileName>
-      <FilenameWithoutPath>usart3proc_main.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\usart3proc\usart3proc_fun.c</PathWithFileName>
+      <FilenameWithoutPath>usart3proc_fun.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

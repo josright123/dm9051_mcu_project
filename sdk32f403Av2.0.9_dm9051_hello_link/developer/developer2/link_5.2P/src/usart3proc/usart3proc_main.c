@@ -92,9 +92,9 @@ void usart3_configuration(void)
   gpio_init(GPIOB, &gpio_init_struct);
 
   /* config usart nvic interrupt */
-//  nvic_priority_group_config(NVIC_PRIORITY_GROUP_4);
-//  nvic_irq_enable(USART2_IRQn, 0, 0);
-//  nvic_irq_enable(USART3_IRQn, 0, 0);
+  nvic_priority_group_config(NVIC_PRIORITY_GROUP_4);
+  nvic_irq_enable(USART2_IRQn, 0, 0);
+  nvic_irq_enable(USART3_IRQn, 0, 0);
 
   /* configure usart2 param */
   usart_init(USART2, 115200, USART_DATA_8BITS, USART_STOP_1_BIT);
@@ -107,14 +107,14 @@ void usart3_configuration(void)
   usart_receiver_enable(USART3, TRUE);
 
   /* enable usart2 and usart3 interrupt */
-//  usart_interrupt_enable(USART2, USART_RDBF_INT, TRUE);
+  usart_interrupt_enable(USART2, USART_RDBF_INT, TRUE);
   usart_enable(USART2, TRUE);
 
-//  usart_interrupt_enable(USART3, USART_RDBF_INT, TRUE);
+  usart_interrupt_enable(USART3, USART_RDBF_INT, TRUE);
   usart_enable(USART3, TRUE);
 
-//  usart_interrupt_enable(USART2, USART_TDBE_INT, TRUE);
-//  usart_interrupt_enable(USART3, USART_TDBE_INT, TRUE);
+  usart_interrupt_enable(USART2, USART_TDBE_INT, TRUE);
+  usart_interrupt_enable(USART3, USART_TDBE_INT, TRUE);
 }
 
 /**
@@ -147,26 +147,29 @@ int usart3proc_main(void)
 {
 //  system_clock_config();
 //  at32_board_init();
-  usart3_configuration();
+//  usart3_configuration();
 
   /* wait until end of transmission from usart2 to usart3 */
   while(usart3_rx_counter < usart2_tx_buffer_size);
 
   /* wait until end of transmission from usart3 to usart2 */
-  while(usart2_rx_counter < usart3_tx_buffer_size);
+//  while(usart2_rx_counter < usart3_tx_buffer_size);
 
-  while(1)
-  {
+//  while(1)
+//  {
     /* compare data buffer */
-    if(buffer_compare(usart2_tx_buffer, usart3_rx_buffer, USART2_TX_BUFFER_SIZE) && \
-       buffer_compare(usart3_tx_buffer, usart2_rx_buffer, USART3_TX_BUFFER_SIZE))
+//    if(buffer_compare(usart2_tx_buffer, usart3_rx_buffer, USART2_TX_BUFFER_SIZE) && \
+//       buffer_compare(usart3_tx_buffer, usart2_rx_buffer, USART3_TX_BUFFER_SIZE))
+    if(buffer_compare(usart2_tx_buffer, usart3_rx_buffer, USART2_TX_BUFFER_SIZE))    
     {
       at32_led_toggle(LED2);
       at32_led_toggle(LED3);
       at32_led_toggle(LED4);
       delay_sec(1);
+      printf(": test start...\r\n");
     }
-  }
+//  }
+  return 0;
 }
 
 /**

@@ -40,8 +40,8 @@
 
 #include "testproc/dm9051_lw_testproc.h" //#include "dm9051_at32_decl_support.h" //#include "dm9051_at32_decl.h"
 
-// usart3proc_main.h
-#include "usart3proc/usart3proc_main.h"
+// usart3proc_fun.h
+#include "usart3proc/usart3proc_fun.h"
 
 /**
  * @brief  main function.
@@ -55,7 +55,6 @@ int main(void)
   at32_board_init(); 
   uart_print_init(115200);
   usart3_configuration();    
-
 
   testproc_board_initialize(); // dm9051_board_initialize
   id = testproc_drv_initialize();
