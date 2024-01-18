@@ -348,11 +348,19 @@ const gp_set_t *common_rst = NULL; //&pb8_rst_gpio_set;
 #if 1
 #define devconf	devconf_XXX
 const static spi_dev_t devconf_XXX = {
-	"AT32F413 SPI1 ETHERNET, sck/mi/mo/cs pb3/pb4/pb5/pb12",
+	/*
+	"AT32F413 SPI1 ETHERNET, sck/mi/mo/cs pb3/pb4/pb5/pa15",
 	{"SPI1", SPI1, CRM_SPI1_PERIPH_CLOCK},
 	{GPIOB, GPIO_PINS_3, CRM_GPIOB_PERIPH_CLOCK, GPIO_MODE_MUX, GPIO_PINSRC_NULL, GPIO_MUX_NULL},  //ISCK
 	{GPIOB, GPIO_PINS_4, CRM_GPIOB_PERIPH_CLOCK, GPIO_MODE_MUX,	GPIO_PINSRC_NULL, GPIO_MUX_NULL},	//IMISO
 	{GPIOB, GPIO_PINS_5, CRM_GPIOB_PERIPH_CLOCK, GPIO_MODE_MUX,	GPIO_PINSRC_NULL, GPIO_MUX_NULL},	//IMOSI
+	*/
+	"AT32F413 SPI1 ETHERNET, sck/mi/mo/cs pa5/pa6/pa7/pa15",
+	{"SPI1", SPI1, CRM_SPI1_PERIPH_CLOCK},
+	{GPIOA, GPIO_PINS_5, CRM_GPIOA_PERIPH_CLOCK, GPIO_MODE_MUX, GPIO_PINSRC_NULL, GPIO_MUX_NULL},  //ISCK
+	{GPIOA, GPIO_PINS_6, CRM_GPIOA_PERIPH_CLOCK, GPIO_MODE_MUX,	GPIO_PINSRC_NULL, GPIO_MUX_NULL},	//IMISO
+	{GPIOA, GPIO_PINS_7, CRM_GPIOA_PERIPH_CLOCK, GPIO_MODE_MUX,	GPIO_PINSRC_NULL, GPIO_MUX_NULL},	//IMOSI
+
 	{GPIOA, GPIO_PINS_15, CRM_GPIOA_PERIPH_CLOCK, GPIO_MODE_OUTPUT, GPIO_PINSRC_NULL, GPIO_MUX_NULL}, //(PA15) Test-SPI1
 	/*{GPIOB, GPIO_PINS_12, CRM_GPIOB_PERIPH_CLOCK, GPIO_MODE_OUTPUT*/ /*GPIO_MODE_MUX*/ /*, GPIO_PINSRC_NULL, GPIO_MUX_NULL},*/ //(PB12) Test-ISP2 OK
 	/*
@@ -800,9 +808,13 @@ static void spi_add(void) //=== pins_config(); //total_eth_count++;
 
 #if 1
   // When if [AT32F413/415], when SPI1 use pb3/pb4/pb5 for sck/mi/mo
-  crm_periph_clock_enable(CRM_IOMUX_PERIPH_CLOCK, TRUE);
-  gpio_pin_remap_config(SWJTAG_GMUX_010, TRUE);
-  gpio_pin_remap_config(SPI1_MUX_01, TRUE);
+  if (spi_number() == SPI1) {
+	  crm_periph_clock_enable(CRM_IOMUX_PERIPH_CLOCK, TRUE);
+	  gpio_pin_remap_config(SWJTAG_GMUX_010, TRUE);
+	  //gpio_pin_remap_config(SPI1_MUX_01, TRUE);
+	  //.
+	  //.dma_channel_enable(DMA1_CHANNEL4, TRUE);
+  }
 
 //==spi_intf_config();
 //=spi_pins_config(gpio_wires(_pinCode));
@@ -813,8 +825,6 @@ static void spi_add(void) //=== pins_config(); //total_eth_count++;
   spi_config(); //(spi_port_ptr(_pinCode));
 //=gpio_cs_pin_config();
   gpio_pin_config(&gpio_cs(), GPIO_PULL_UP);
-
-  dma_channel_enable(DMA1_CHANNEL4, TRUE); //TEST.
 #else
   gpio_pin_config(&gpio_wire_sck(), GPIO_PULL_NONE); //,GPIO_MODE_MUX
   gpio_pin_config(&gpio_wire_mi(), GPIO_PULL_NONE); //,GPIO_MODE_MUX
