@@ -1,10 +1,8 @@
-#if 0
-
 #include "dm9051_lw.h" //#include "dm9051opts.h"
 #include "dm9051_lw_conf.h" //#include "dm9051_lw_decl.h"
 #include "dm9051_lw_testproc_type.h"
 #include "dm9051_lw_testproc.h"
-//#include "dm9051_lw_sync.h"
+#include "dm9051_lw_sync.h"
 	
 #if 1 
 /* [arch ctype "arch.h" solution. ] */
@@ -311,7 +309,7 @@ bench_receive_period(void) {
 			memset(disp, 0, sizeof(disp));
 			memcpy(disp, zbuff, len - 4); //sizeof(zbuff)
 			printf("%s, recv \"%s\" len %u\r\n", mstep_spi_conf_name(), disp, len - 4); //sizeof(zbuff)
-			dm9051_rxlog_monitor_rx_all(2, zbuff, len - 4); //function_monitor_rx_all(zbuff, len - 4);
+			function_monitor_rx(HEAD_SPC, zbuff, len - 4); //function_monitor_rx_all(zbuff, len - 4);
 			//break;
 		}
 	}
@@ -325,9 +323,9 @@ void bench_test_tx_and_rx(void)
 	
 	for (i = 0; i < ETHERNET_COUNT; i++) {
 		mstep_set_net_index(i);
-		rcr[i] = cspi_read_reg(DM9051_RCR);
-		cspi_write_reg(DM9051_RCR, 0x33); //for the any raw data
-		rcrn[i] = cspi_read_reg(DM9051_RCR);
+		rcr[i] = spi_read_reg(DM9051_RCR);
+		spi_write_reg(DM9051_RCR, 0x33); //for the any raw data
+		rcrn[i] = spi_read_reg(DM9051_RCR);
 		printf("%d. bench_test.s rcr %02x to %02x\r\n", i, rcr[i], rcrn[i]);
 	}
 	
@@ -338,7 +336,7 @@ void bench_test_tx_and_rx(void)
 	printf("%s, send \"%s\" len %d\r\n", mstep_spi_conf_name(), 
 		"abcdefghijkl........abcdefghijkl........abcdefghijkl.....xxx",
 		strlen("abcdefghijkl........abcdefghijkl........abcdefghijkl.....xxx"));
-	dm9051_txlog_monitor_tx_all(2, "abcdefghijkl........abcdefghijkl........abcdefghijkl.....xxx",
+	function_monitor_tx(HEAD_SPC, "abcdefghijkl........abcdefghijkl........abcdefghijkl.....xxx",
 		strlen("abcdefghijkl........abcdefghijkl........abcdefghijkl.....xxx"));
 
 	bench_receive_period();
@@ -349,7 +347,7 @@ void bench_test_tx_and_rx(void)
 	printf("%s, send \"%s\" len %d\r\n", mstep_spi_conf_name(), 
 		"play-game", 
 		strlen("play-game"));
-	function_monitor_tx(2, "play-game",
+	function_monitor_tx(HEAD_SPC, "play-game",
 		strlen("play-game"));
 
 	bench_receive_period();
@@ -397,8 +395,8 @@ uip_ethernet_output(void *nullnetif, void *nullp,
 					
 	TestProcBuff_Len += sizeof(struct eth_hdr);
 #endif
-	dm9051_txlog_monitor_tx_all(2, &TestProcBuff[0].tx, TestProcBuff_Len);
 	dm9051_tx(&TestProcBuff[0].tx, TestProcBuff_Len);
+	function_monitor_tx(HEAD_SPC, &TestProcBuff[0].tx, TestProcBuff_Len);
 }
 
 #if (ETHERNET_COUNT == 1) 
@@ -437,169 +435,161 @@ static void self_test_partner_ARPb(void)
 static uint16_t
 self_receive_period(void) {
 	int i;
-	//uint16_t len;
-	//uint8_t *zbuff = &TestProcBuff[0].rx;
-	
+	uint16_t len;
+	uint8_t *zbuff = &TestProcBuff[0].rx;
 	for (i = 0; i< 100; i++) {
 		dm_delay_ms(10);
+		len = dm9051_rx(zbuff);
 		
-		//len = dm9051_rx(zbuff);
-		//if (len) {
-		//	printf("  %s, recv, len %u\r\n", mstep_spi_conf_name(), len - 4); //sizeof(zbuff)
-		//	dm9051_rxlog_monitor_rx_all(2, zbuff, len - 4); //function_monitor_rx_all(zbuff, len - 4);
-		//	return len;
-		//}
+		if (len) {
+			printf("  %s, recv, len %u\r\n", mstep_spi_conf_name(), len - 4); //sizeof(zbuff)
+			function_monitor_rx(HEAD_SPC, zbuff, len - 4); //function_monitor_rx_all(zbuff, len - 4);
+			return len;
+		}
 	}
 	return 0;
 }
 #endif
 
-int test_total_send_count_setup; //.
-
-//#ifdef AT32F437xx
-int test_line7_enter = 0;
-uint8_t my_debounce = 0;
-
-uint16_t test_rx_hdlr(void)
-{
-	uint8_t *zbuff = &TestProcBuff[0].rx;
-	uint16_t len;
-
-printf("[rx_start.s]\r\n");
-	len = dm9051_rx(zbuff);
-printf("[rx_start.e] len = %d\r\n", len);
-	
-	if (len) {
-		printf("  %s, recv, len %u\r\n", mstep_spi_conf_name(), len - 4); //sizeof(zbuff)
-		dm9051_rxlog_monitor_rx_all(2, zbuff, len - 4); //dm9051_rxlog_monitor_tx_all(zbuff, len - 4);
-	}
-	return len;
-}
-
-int CalcModelShow(int inParam)
-{
-	int outParam = inParam - 1;
-	printf("................................[Yes-Good]: line7_proc() CalcModel-Show tested-packets %d recved-remain %d\r\n", inParam, outParam);
-	return outParam;
-}
-
-void line7_proc(void) {
-  uint16_t len;
-	
-  uint8_t isr;
-  isr = cspi_read_reg(DM9051_ISR);
-  
-  printf("[INFO]: line7() enter %d ... isr %02x\r\n", ++test_line7_enter, isr);
-  printf("................................ line7_proc(), where test_line7_enter_check_setup is %d\r\n", test_line7_enter_check_setup);
-	
-  if (test_line7_enter_check_setup == 0)
-	  printf("................................ [WARN]: line7_proc() encounterred illegal enter! '_test_line7_enter_check_setup' still on 0\r\n");
-
-  if (my_debounce == 0) {
-	my_debounce = 8;
-	at32_led_toggle(LED4);
-	//at32_led_toggle(LED2);
-	//at32_led_toggle(LED3);
-	//at32_led_on(LED4);
-  }
-  
-  #if 1
-  //lwip_rx_loop_handler();
-  //lwip_rx_hdlr();
-  do {
-	len = test_rx_hdlr();
-	if (len) {
-		if (test_total_send_count_setup) {
-			
-			test_total_send_count_setup = CalcModelShow(test_total_send_count_setup);
-			
-		} else 
-			printf("[WARN]: line7() encounterred under_flow count!\r\n");
-	}
-  } while(len);
-  #endif
-  
-  my_debounce += 8; // if this only, when 256, i.e. 0
-  my_debounce &= 0x3f; // when 64, i.e. 0
-  
-  isr = cspi_read_reg(DM9051_ISR);
-  printf("[INFO]: line7() exit %d ... isr %02x\r\n", ++test_line7_enter, isr);
-  printf("[INFO]: line7() exit write isr %02x\r\n", isr);
-  cspi_write_reg(DM9051_ISR, isr);
-}
-//#endif
-
-void display_recv_point(char *hstr)
-{
-  uint8_t rxpl, rxph;
-  rxpl = cspi_read_reg(DM9051_RWPAL);
-  rxph = cspi_read_reg(DM9051_RWPAH);
-  printf("[%s] _recv_wr_point %02x%02x\r\n", hstr, rxph, rxpl);
-}
-
 #if (ETHERNET_COUNT == 1) 
 int tx_and_rx_packets(int t) {
 	uint16_t len;
-display_recv_point("Start");	
-	test_total_send_count_setup = t; //...
-	printf("- TEST a trip for %d packets ...\r\n", t);
-
-	
 	printf("  %s, send ARP 1\r\n", mstep_spi_conf_name());
 	self_test_partner_ARPa();
-	
 	len = self_receive_period();
 	if (len) t--;
-display_recv_point("Send1");
 	
 	//printf("\r\n");
 	
 	printf("  %s, send ARP 2\r\n", mstep_spi_conf_name());
 	self_test_partner_ARPb();
-	
 	len = self_receive_period();
 	if (len) t--;
-display_recv_point("Send2");
-	
 	return t;
 }
 
-void self_test_tx_and_rx(void) //So can CONNECT PHY port RJ-45 a "loopback core".
+static void self_test_tx_and_rx(void) //So can CONNECT PHY port RJ-45 a "loopback core".
 {	
 	uint16_t len;
-	/*int tcount;*/ //= 2;
-
-printf("[RUN1]\r\n");	
-	/*tcount =*/ tx_and_rx_packets(2);
-	
-	if (test_total_send_count_setup) {
+	int tcount; //= 2;
 		
+	tcount = tx_and_rx_packets(2);
+	
+	if (tcount) {
 		int tloop = 8;
 		uint8_t rcr, rcrn;
 		
-		printf("  :No satisfy receive every ARP echo! Read something in the rx fifo. Use promiscuous! [CHECK-POINT]\r\n");
-		printf("  :! [CHECK-POINT]\r\n");
+		printf("  :No satisfy receive every ARP echo! Read something in the rx fifo. Use promiscuous!\r\n");
 		printf("\r\n");
 		
-		rcr = cspi_read_reg(DM9051_RCR);
-		cspi_write_reg(DM9051_RCR, 0x33);
-		rcrn = cspi_read_reg(DM9051_RCR);
-		printf(": [.m bench_test rcr %02x to %02x]\r\n", rcr, rcrn);
+		rcr = spi_read_reg(DM9051_RCR);
+		spi_write_reg(DM9051_RCR, 0x33);
+		rcrn = spi_read_reg(DM9051_RCR);
+		printf(": .m bench_test rcr %02x to %02x\r\n", rcr, rcrn);
 		
-printf("[RUN2]\r\n");	
-		/*tcount =*/ tx_and_rx_packets(2);
-		
-		while (test_total_send_count_setup && tloop--) {
-			
+		tcount = tx_and_rx_packets(2);
+		while (tloop-- && tcount) {
 			len = self_receive_period();
-			if (len) /*tcount--*/;
-			
+			if (len) tcount--;
 		}
+		printf("  :Read finish: %s\r\n", tcount ? "still lose some packets!" : "corresponse packets rececived!");
+		printf("\r\n");
 	}
-	
-display_recv_point("Stop");
-	printf("  :Read finish: %s\r\n", test_total_send_count_setup ? "still lose some packets!" : "corresponse packets rececived!");
-	printf("\r\n");
 }
 #endif // (ETHERNET_COUNT==1)
+
+void testproc_drv_initialize(void)
+{
+#if (ETHERNET_COUNT >= 2)
+	//=ethernetif_dm9051_init_dual(MACaddr);
+	int i;
+	uint16_t id;
+	const uint8_t addr_meanless[6] = { 0 }; //no exactly need.
+
+	for (i = 0; i < ETHERNET_COUNT; i++) { //get_eth_interfaces()
+		mstep_set_net_index(i); //set_pin_code(i);
+		dm9051_poweron_rst();
+		dm_delay_ms(1);
+		id = dm9051_init(addr_meanless);
+		display_verify_chipid("dm9051_init", mstep_spi_conf_name(), id);
+	}
+	mstep_set_net_index(0);
+	
+#elif (ETHERNET_COUNT == 1) 
+	//
+	// test init dual only need while only 1 ethernet port exist.
+	//
+	
+	//=test_dm9051_init_dual(MACaddr);
+	uint16_t id;
+
+	dm9051_poweron_rst();
+	dm_delay_ms(1);
+	id = dm9051_init(MACaddr);
+	display_verify_chipid("dm9051_init", mstep_spi_conf_name(), id);
 #endif
+}
+
+void testproc_packets_test(void)
+{
+#if (ETHERNET_COUNT >= 2)
+  //
+  // JJ.Test Multi-SPI.
+  //
+  bench_test_tx_and_rx(); //test_ethernetif_txrx();
+  printf("test end\r\n"); //printf("read chip-id end\r\n");
+  printf(": test end\r\n");
+  printf(": while(1);\r\n");
+  while(1) ;
+#elif (ETHERNET_COUNT == 1)
+  //
+  // my debug test!
+  //
+	
+  //save.start
+  int i;
+  uint8_t rcr, rcrn, nsr;
+  rcr = spi_read_reg(DM9051_RCR);
+  spi_write_reg(DM9051_RCR, 0x31);
+  rcrn = spi_read_reg(DM9051_RCR);
+  printf("\r\n");
+	printf(": .s bench_test rcr %02x to %02x\r\n", rcr, rcrn);
+
+  for (i=0; i<8; i++)
+	spi_write_reg(DM9051_MAR+i, 0x00); // not accept broadcast, only unicast for me is allowed.
+
+  i = 0;
+  while(i++ < 20) {
+	nsr = spi_read_reg(DM9051_NSR);
+	if (nsr & NSR_LINKST) {
+		if (i > 1) printf(". link is up\r\n");
+		self_test_tx_and_rx(); //test...
+		break;
+	}
+	if (!(nsr & NSR_LINKST)) {
+		dm_delay_ms(100);
+		printf("%s", (i < 20) ? "." : ". link is down\r\n");
+	}
+	if (i == 1)
+		printf("  ");
+  }
+	
+  spi_write_reg(DM9051_RCR, rcr);
+  rcr = spi_read_reg(DM9051_RCR);
+  printf(": .e bench_test rcr %02x to %02x\r\n", rcrn, rcr);
+  //restore.done
+  printf(": test end\r\n");
+  printf(": while(1);\r\n");
+  while(1) ;
+#endif
+}
+
+void testproc_board_initialize(void)
+{
+  printf("\r\n");
+  printf("- dm9051_board_initialize [%d spi board(s), 'devconf' as %s]\r\n", mstep_conf_spi_count(), mstep_conf_type());
+  printf("- dm9051_board_initialize [%d eth device(s)]\r\n", ETHERNET_COUNT);
+  printf("\r\n");
+  dm9051_board_initialize(); //netif_create(&ethernetif_create); //at32_dm9051_init_configuration_all(); //env_dm9051f_system_init();
+  printf("\r\n");
+}

@@ -335,7 +335,7 @@
               <MiscControls></MiscControls>
               <Define>AT32F415RCT7,USE_STDPERIPH_DRIVER,AT_START_F415_V1</Define>
               <Undefine></Undefine>
-              <IncludePath>..\inc;..\..\..\..\at32f415_board;..\..\..\..\libraries\drivers\inc;..\..\..\..\libraries\cmsis\cm4\core_support;..\..\..\..\libraries\cmsis\cm4\device_support;..\src;..\..\..\dm9051_lw2312v1_5.2P</IncludePath>
+              <IncludePath>..\inc;..\..\..\..\at32f415_board;..\..\..\..\libraries\drivers\inc;..\..\..\..\libraries\cmsis\cm4\core_support;..\..\..\..\libraries\cmsis\cm4\device_support;..\src;..\..\..\dm9051_lw</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -395,19 +395,24 @@
               <FilePath>..\src\at32f415_int.c</FilePath>
             </File>
             <File>
+              <FileName>tmr_init.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\tmr_init.c</FilePath>
+            </File>
+            <File>
               <FileName>dm9051_lw.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\dm9051_lw2312v1_5.2P\dm9051_lw.c</FilePath>
+              <FilePath>..\..\..\dm9051_lw\dm9051_lw.c</FilePath>
             </File>
             <File>
               <FileName>dm9051_lw_conf.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\dm9051_lw2312v1_5.2P\dm9051_lw_conf.c</FilePath>
+              <FilePath>..\..\..\dm9051_lw\dm9051_lw_conf.c</FilePath>
             </File>
             <File>
-              <FileName>tmr_init.c</FileName>
+              <FileName>dm9051opts.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\tmr_init.c</FilePath>
+              <FilePath>..\..\..\dm9051_lw\dm9051opts.c</FilePath>
             </File>
           </Files>
         </Group>

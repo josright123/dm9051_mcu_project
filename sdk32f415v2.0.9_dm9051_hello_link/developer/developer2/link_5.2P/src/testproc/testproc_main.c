@@ -38,15 +38,16 @@ uint16_t testproc_drv_initialize(void)
 
 	for (i = 0; i < ETHERNET_COUNT; i++) { //get_eth_interfaces()
 		mstep_set_net_index(i); //set_pin_code(i);
-		dm9051_poweron_rst();
-		dm_delay_ms(1);
+		
+		//dm9051_poweron_rst();
+		//dm_delay_ms(1);
 		//id = 
 		id = dm9051_init(addr_meanless);
-		dm9051_board_irq_enable();
-		dm9051_start(addr_meanless);
+		//dm9051_board_irq_enable();
+		//dm9051_start(addr_meanless);
 		//display_verify_chipid("dm9051_init", mstep_spi_conf_name(), id);
 	}
-	mstep_set_net_index(0);
+	//mstep_set_net_index(0);
 	return 0;
 #elif (ETHERNET_COUNT == 1) 
 	//
@@ -56,8 +57,8 @@ uint16_t testproc_drv_initialize(void)
 	//=test_dm9051_init_dual(MACaddr);
 	//uint16_t id;
 
-	dm9051_poweron_rst();
-	dm_delay_ms(1);
+	//dm9051_poweron_rst();
+	//dm_delay_ms(1);
 	//id = 
 	printf("................................ dm9051 init\r\n");
 	id = dm9051_init(MACaddr);
@@ -300,7 +301,7 @@ memp_free(memp_t type, void *mem)
 void phy_link_timer(void *arg)
 {
   net_t *net = arg;
-	uint8_t chip_link_up = (dm9051_link_update() & 0x0004) ? 1 : 0;
+	uint8_t chip_link_up = (dm9051_bmsr_update() & 0x0004) ? 1 : 0;
 	
   if(!netif_is_link_up(netflags)) {
     if (chip_link_up) {
@@ -481,9 +482,14 @@ void testproc_run(void)
 void testproc_board_initialize(void)
 {
   printf("\r\n");
-  printf("- dm9051_board_initialize [%d spi board(s), 'devconf' as %s]\r\n", mstep_conf_spi_count(), mstep_conf_type());
+  printf("- dm9051_board_initialize [%d spi board(s), 'devconf' as %s]\r\n", /*mstep_conf_spi_count()*/ BOARD_SPI_COUNT, mstep_conf_type());
   printf("- dm9051_board_initialize [%d eth device(s)]\r\n", ETHERNET_COUNT);
   printf("\r\n");
   dm9051_board_initialize(); //netif_create(&ethernetif_create); //at32_dm9051_init_configuration_all(); //env_dm9051f_system_init();
+  
+  printf("\r\n");
+  ethcnt_ifdiplay_iomode(); //has GpioDisplay();
+  ethcnt_ifdiplay();
+
   printf("\r\n");
 }
