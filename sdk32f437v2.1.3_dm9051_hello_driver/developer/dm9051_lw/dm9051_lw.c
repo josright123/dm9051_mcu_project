@@ -426,8 +426,10 @@ void dm9051_rx_mode_subprocess(void)
 static void dm9051_set_par(const u8 *macadd)
 {
 	int i;
-	for (i=0; i<6; i++)
+	for (i=0; i<6; i++) {
 		DM9051_Write_Reg(DM9051_PAR+i, macadd[i]);
+			printf("write reg %02x = %02x\r\n", DM9051_PAR+i, macadd[i]);
+	}
 }
 static void dm9051_set_mar(void)
 {
@@ -803,7 +805,7 @@ void dm9051_tx(uint8_t *buf, uint16_t len)
 
 char *display_identity_bannerline_title = NULL;
 char *display_identity_bannerline_default =  ": Read the revisions";
-char *display_identity_bannerline_defaultN = ": Read bare registers";
+char *display_identity_bannerline_defaultN = ": Bare bare registers";
 
 int display_identity(char *spiname, uint16_t id, uint8_t *ids, uint8_t id_adv)
 {
@@ -822,6 +824,7 @@ int display_identity(char *spiname, uint16_t id, uint8_t *ids, uint8_t id_adv)
 			//Read par
 			uint8_t buf[6];
 		
+			display_identity_bannerline_defaultN = ": Read bare registers";
 			cspi_read_regs(DM9051_PAR, buf, 6, csmode()); //dm9051opts_csmode_tcsmode()
 			printf("%s[%d] ::: chip-mac %02x%02x%02x%02x%02x%02x\r\n",
 				display_identity_bannerline_title ? display_identity_bannerline_title : display_identity_bannerline_defaultN,
@@ -886,8 +889,15 @@ uint16_t dm9051_init_setup(const uint8_t *adr)
 
 void dm9051_start(const uint8_t *adr)
 {
+	display_identity_bannerline_defaultN = ": write bare registers";
+	printf("%s[%d] ::: chip-mac %02x%02x%02x%02x%02x%02x\r\n",
+				display_identity_bannerline_title ? display_identity_bannerline_title : display_identity_bannerline_defaultN,
+				mstep_get_net_index(), adr[0], adr[1], adr[2], adr[3], adr[4], adr[5]);
+
 	dm9051_mac_adr(adr);
 	dm9051_rx_mode();
+	
+	display_chipmac();
 }
 
 uint16_t dm9051_init(const uint8_t *adr)
@@ -900,7 +910,7 @@ uint16_t dm9051_init(const uint8_t *adr)
 //	id = dm9051_init_setup(adr);
 //#else
 	bannerline_log();
-	printf("Read %s, %s, %s, %02x%02x%02x%02x%02x%02x\r\n",
+	printf("Read %s, %s, to set mac/ %s, %02x%02x%02x%02x%02x%02x\r\n",
 			mstep_conf_info(),
 			mstep_conf_cpu_spi_ethernet(),
 			mstep_conf_cpu_cs_ethernet(),

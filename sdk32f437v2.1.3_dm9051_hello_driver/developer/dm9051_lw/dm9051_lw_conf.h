@@ -116,7 +116,7 @@ void cspi_write_mem(u8 *buf, u16 len);
 //init
 #if HELLO_DRIVER_API
 int dm9051_boards_initialize(void);
-void ethernet_interfaces_initialize(void);
+//void ethernet_interfaces_initialize(void);
 #endif
 void exint_menable(nvic_priority_group_type priority); //void dm9051_board_irq_enable(void);
 void dm9051_irqlines_proc(void);

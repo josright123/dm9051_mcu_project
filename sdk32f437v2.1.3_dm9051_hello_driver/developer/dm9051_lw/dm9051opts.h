@@ -118,6 +118,17 @@ u8 first_log_get(int i);
 #define PTR_RSTGPIO(field) \
 	((option_rst_common)->field)
 
+//------------------
+
+enum {
+	UNIT_TRANS,
+	ENUM_TRANS,
+};
+typedef void (* trans_t)(void); //typedef void (* trans_t)(void *arg);
+void TRANS_CONN(trans_t trans_func, uint8_t trans_type);
+
+//------------------
+
 #define TO_ADD_CODE_LATER_BACK	0
 
 #endif //__DM9051_OPTS_H

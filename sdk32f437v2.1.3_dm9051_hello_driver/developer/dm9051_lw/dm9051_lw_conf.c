@@ -259,14 +259,14 @@ int dm9051_boards_initialize(void)
   return ETHERNET_COUNT;
 }
 
-void ethernet_interfaces_initialize(void)
-{
-  int i;
-  for (i = 0; i < ETHERNET_COUNT; i++) {
-	mstep_set_net_index(i); //+
-	dm9051_init(get_eth_mac()); //= (&_mac_addresse[i][0]);
-  }
-}
+//void ethernet_interfaces_initialize(void)
+//{
+//  int i;
+//  for (i = 0; i < ETHERNET_COUNT; i++) {
+//	mstep_set_net_index(i); //+
+//	dm9051_init(get_eth_mac());
+//  }
+//}
 
 // -
 /*********************************
@@ -306,11 +306,15 @@ static void rst_pin_pulse(void) {
 void cspi_read_regs(uint8_t reg, u8 *buf, u16 len, csmode_t csmode)
 {
 	int i;
+	int regs = (reg == DM9051_PAR);
+
 	if (csmode == CS_LONG) {
 	  dm9051if_cs_lo();
 	  for(i=0; i < len; i++, reg++) {
 		dm9051_spi_command_write(reg | OPC_REG_R);
 		buf[i] = dm9051_spi_dummy_read();
+		if (regs)
+		  printf("long read reg %02x = %02x\r\n", reg, buf[i]);
 	  }
 	  dm9051if_cs_hi();
 	}
@@ -318,6 +322,8 @@ void cspi_read_regs(uint8_t reg, u8 *buf, u16 len, csmode_t csmode)
 	  for(i=0; i < len; i++, reg++) {
 		//printf("cspi_read_reg(reg) ..\r\n");
 		buf[i] = cspi_read_reg(reg);
+		if (regs)
+		  printf("each read reg %02x = %02x\r\n", reg, buf[i]);
 	  }
 	}
 }

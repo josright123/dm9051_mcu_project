@@ -110,3 +110,20 @@ u8 first_log_get(int i)
 //{
 //	gfirst_log[i] = 0;
 //}
+
+void TRANS_CONN(trans_t trans_func, uint8_t trans_type)
+{
+	if (trans_type == UNIT_TRANS) {
+		mstep_set_net_index(0); //+
+		trans_func();
+		return;
+	}
+	
+	if (trans_type == ENUM_TRANS) {
+	  int i;
+	  for (i = 0; i < ETHERNET_COUNT; i++) {
+		mstep_set_net_index(i); //+
+		trans_func();; //dm9051_init(mstep_eth_mac());
+	  }
+	}
+}

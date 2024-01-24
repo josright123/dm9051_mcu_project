@@ -36,39 +36,23 @@
   * @{
   */
 
-  /*printf("mac_addresse[0] %02x%02x%02x%02x%02x%02x\r\n",
-	pmac_addresse[0][0],
-	pmac_addresse[0][1],
-	pmac_addresse[0][2],
-	pmac_addresse[0][3],
-	pmac_addresse[0][4],
-	pmac_addresse[0][5]
-	);
-  mstep_set_net_index(0);
-  dm9051_init(&pmac_addresse[0][0]);
-  printf("mac_addresse[1] %02x%02x%02x%02x%02x%02x\r\n",
-	pmac_addresse[1][0],
-	pmac_addresse[1][1],
-	pmac_addresse[1][2],
-	pmac_addresse[1][3],
-	pmac_addresse[1][4],
-	pmac_addresse[1][5]
-	);
-  mstep_set_net_index(1);
-  dm9051_init(&pmac_addresse[1][0]);*/
-
-void title(void) {
+void title(char *appname) {
   bannerline_log();
   bannerline_log();
-  printf("hello_driver start: [BOARD_SPI COUNT] %d  /  Operating: [ETHERNET COUNT] %d\r\n", BOARD_SPI_COUNT, ETHERNET_COUNT);
+  printf("%s start: [BOARD_SPI COUNT] %d  /  Operating: [ETHERNET COUNT] %d\r\n", appname, BOARD_SPI_COUNT, ETHERNET_COUNT);
 }
 
-void ethernets_init(void) {
-  int i;
-  for (i = 0; i < ETHERNET_COUNT; i++) {
-	mstep_set_net_index(i); //+
+//void ethernets_init(void) {
+//  int i;
+//  for (i = 0; i < ETHERNET_COUNT; i++) {
+//	mstep_set_net_index(i); //+
+//	dm9051_init(mstep_eth_mac());
+//  }
+//}
+
+void drviver_init(void) {
 	dm9051_init(mstep_eth_mac());
-  }
+	//.display_chipmac();
 }
 
 /**
@@ -82,17 +66,17 @@ int main(void)
   at32_board_init();
   uart_print_init(115200);
 	
-  title();
+  title("hello_driver");
   //GpioDisplay();
   //ethcnt_ifdiplay_iomode();
 
-#if 0
-  dm9051_boards_initialize(); //of-1.12
-  ethernet_interfaces_initialize(); //of-1.12
-#endif
+//#if 0
+//  dm9051_boards_initialize(); //of-1.12
+//  ethernet_interfaces_initialize(); //of-1.12
+//#endif
 #if 1
   dm9051_boards_initialize(); //of-1.12
-  ethernets_init();
+  TRANS_CONN(drviver_init, ENUM_TRANS); //ethernets_init();
 #endif
 	
   while(1) {
