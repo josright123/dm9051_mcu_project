@@ -49,7 +49,8 @@ const spi_dev_t devconf[BOARD_SPI_COUNT] = {
 	devconf_at437_spi4("AT32F437 ETHERNET SPI4", "sck/mi/mo/ pe2/pe5/pe6", "cs/ pe4"),
 	devconf_at437_spi2("AT32F437 ETHERNET SPI2", "sck/mi/mo/ pd1/pc2/pd4", "cs/ pd0"),
 	devconf_at437_spi1("AT32F437 ETHERNET SPI1", "sck/mi/mo/ pa5/pa6/pa7", "cs/ pa15"),
-	#else
+
+	#elif defined (AT32F413xx)
 	#define devconf_at413_spi2(info, spi_setting_name, cs_setting_name) \
 		{ \
 			info, \
@@ -78,7 +79,37 @@ const spi_dev_t devconf[BOARD_SPI_COUNT] = {
 	devconf_at413_spi2("AT32F413 ETHERNET SPI2", "sck/mi/mo/ pb13/pb14/pb15", "cs/ pb12"),
 	devconf_at413_spi1("AT32F413 ETHERNET SPI1", "sck/mi/mo/ pa5/pa6/pa7", "cs/ pB12", GPIOB, GPIO_PINS_12, CRM_GPIOB_PERIPH_CLOCK),
 	devconf_at413_spi1("AT32F413 ETHERNET SPI1", "sck/mi/mo/ pa5/pa6/pa7", "cs/ pa4", GPIOA, GPIO_PINS_4, CRM_GPIOA_PERIPH_CLOCK),
+
+	#elif defined (AT32F403Axx)
+	#define devconf_at403a_spi2(info, spi_setting_name, cs_setting_name) \
+		{ \
+			info, \
+			{"SPI2", SPI2, CRM_SPI2_PERIPH_CLOCK}, \
+			spi_setting_name, \
+			{GPIOB, GPIO_PINS_13, CRM_GPIOB_PERIPH_CLOCK, GPIO_MODE_MUX,    GPIO_PINS_SOURCE13, GPIO_MUX_5},  /* //ISCK */ \
+			{GPIOB, GPIO_PINS_14, CRM_GPIOB_PERIPH_CLOCK, GPIO_MODE_MUX,	GPIO_PINS_SOURCE14, GPIO_MUX_5},	/* //IMISO */ \
+			{GPIOB, GPIO_PINS_15, CRM_GPIOB_PERIPH_CLOCK, GPIO_MODE_MUX,	GPIO_PINS_SOURCE15, GPIO_MUX_5},	/* //IMOSI */ \
+			cs_setting_name, \
+			{GPIOB, GPIO_PINS_12, CRM_GPIOB_PERIPH_CLOCK, GPIO_MODE_OUTPUT, GPIO_PINSRC_NULL, GPIO_MUX_NULL}, /* //(PB12) Test-ISP2 OK */ \
+		}
+	#define devconf_at403a_spi1(info, spi_setting_name, cs_setting_name, gpport, pin, gpio_crm_clk) \
+		{ \
+			info, \
+			{"SPI1",	SPI1,			CRM_SPI1_PERIPH_CLOCK}, \
+			spi_setting_name, \
+			{GPIOA,		GPIO_PINS_5, 	CRM_GPIOA_PERIPH_CLOCK, 	GPIO_MODE_MUX, GPIO_PINS_SOURCE5, GPIO_MUX_5},  /* //ISCK */ \
+			{GPIOA,		GPIO_PINS_6, 	CRM_GPIOA_PERIPH_CLOCK, 	GPIO_MODE_INPUT,	GPIO_PINS_SOURCE6, GPIO_MUX_5}, /* //IMISO */ \
+			{GPIOA,		GPIO_PINS_7, 	CRM_GPIOA_PERIPH_CLOCK, 	GPIO_MODE_MUX,	GPIO_PINS_SOURCE7, GPIO_MUX_5}, /* //IMOSI */ \
+			cs_setting_name, \
+			{gpport,	pin, 			gpio_crm_clk, 				GPIO_MODE_OUTPUT, GPIO_PINSRC_NULL, GPIO_MUX_NULL}, /* //(PA4) Test-ISP2 OK */ \
+		}
+	devconf_at403a_spi2("AT32F403A ETHERNET SPI2", "sck/mi/mo/ pb13/pb14/pb15", "cs/ pb12"),
+	devconf_at403a_spi1("AT32F403A ETHERNET SPI1", "sck/mi/mo/ pa5/pa6/pa7", "cs/ pa15", GPIOA, GPIO_PINS_15, CRM_GPIOA_PERIPH_CLOCK),
+	#else
+	#error "not defined board"
 	#endif
+
+	
 };
 
 optsex_t dm9051optsex[BOARD_SPI_COUNT] = { //const 
