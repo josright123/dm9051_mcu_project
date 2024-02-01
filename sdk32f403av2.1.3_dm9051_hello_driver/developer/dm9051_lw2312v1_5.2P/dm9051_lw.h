@@ -7,9 +7,11 @@
 #endif
 
 #include <stdint.h>	 
-//#include "dm9051opts.h" //driver attributes
+#include "dm9051opts.h" //driver attributes
+	 
+#define TEST_PLAN_MODE		0 //1
 
-#define RX_POOL_BUFSIZE	(1514+4)
+#define RX_POOL_BUFSIZE		(1514+4)
 	 
 //#include "lwip/opt.h" //use 'PBUF_POOL_BUFSIZE' (why? moved!!)
 
@@ -31,6 +33,7 @@
 
 /* Exported constants --------------------------------------------------------------------------------------*/ 
 #define DM9051_ID           (0x90510A46)		/* DM9051A ID                                               */
+#define DM9052_ID           (0x90550A46)		/* DM9051A ID                                               */
 #define DM9051_PKT_MAX      (1536)          /* Received packet max size                                     */
 #define DM9051_PKT_RDY      (0x01)          /* Packet ready to receive                                      */
 
@@ -157,20 +160,34 @@
 #define RSR_CE              (1 << 1)
 #define RSR_FOE             (1 << 0)
 
-#define EPCR_REEP           (1<<5)
-#define EPCR_WEP            (1<<4)
-#define EPCR_EPOS           (1<<3)
-#define EPCR_ERPRR          (1<<2)
-#define EPCR_ERPRW          (1<<1)
-#define EPCR_ERRE           (1<<0)
-
 #define INTR_ACTIVE_LOW		(1 << 0)
 
 #define BPTR_DEFAULT		(0x3f)
 #define FCTR_DEAFULT		(0x38)
 #define FCR_DEFAULT			(0xFF)
+#define FCR_DEFAULT1		(0x39)
+#define FCR_DEFAULT_CONF	FCR_DEFAULT
 #define SMCR_DEFAULT		(0x0)
 #define PBCR_MAXDRIVE		(0x44)
+
+/* 0x31 */
+//#define _DM9051_CSCR      (0x31)    /* check sum control register                                         */
+#define TCSCR_UDPCS_ENABLE	(1 << 2)
+#define TCSCR_TCPCS_ENABLE	(1 << 1)
+#define TCSCR_IPCS_ENABLE	(1 << 0)
+/* 0x32 */
+//#define _DM9051_RCSSR     (0x32)    /* receive check sum status register                                  */
+#define RCSSR_UDPS			(1 << 7)
+#define RCSSR_TCPS			(1 << 6)
+#define RCSSR_IPS			(1 << 5)
+#define RCSSR_UDPP			(1 << 4)
+#define RCSSR_TCPP			(1 << 3)
+#define RCSSR_IPP			(1 << 2)
+#define RCSSR_RCSEN			(1 << 1)    //Receive Checksum Checking Enable
+#define RCSSR_DCSE			(1 << 0)	//Discard Checksum Error Packet
+/* rxb */
+#define RXB_ERR				(1 << 1)
+#define RXB_RDY				(1 << 0)
 
 /* 0x3D */
 /* Pause Packet Control Register - default = 1 */
@@ -187,6 +204,7 @@
 /* 0x5E */
 #define MBNDRY_WORD			0
 #define MBNDRY_BYTE			(1 << 7)
+//#define MBNDRY_DEFAULTx	MBNDRY_WORD //MBNDRY_BYTE
 
 #define IMR_PAR             (1 << 7)
 #define IMR_PRM             (1 << 0)
@@ -201,28 +219,49 @@
 //uint16_t phy_read(uint16_t uReg);
 //void phy_write(uint16_t reg, uint16_t value); //[function "phy_write" was available but could never referenced.]
 
+uint16_t eeprom_read(uint16_t uReg);
+
+uint16_t phy_read(uint16_t uReg);
+void phy_write(uint16_t reg, uint16_t value);
+
 void dm9051_poweron_rst(void);
+
+#if HELLO_DRIVER_API
+int check_chip_id(uint16_t id);
 uint16_t dm9051_init(const uint8_t *adr);
-void dm9051_start(const uint8_t *adr);
 uint16_t dm9051_rx(uint8_t *buff);
 void dm9051_tx(uint8_t *buf, uint16_t len);
 void dm9051_reset_process(void);
+#endif
+
+void dm9051_start(const uint8_t *adr);
+uint16_t dm9051_rx_dump(uint8_t *buff);
+
+#if HELLO_DRIVER_API
+uint16_t dm9051_link_update(void);
+#endif
 
 uint16_t read_chip_id(void);
+uint16_t dm9051_bmcr_update(void);
 uint16_t dm9051_bmsr_update(void);
-uint16_t dm9051_link_update(void);
 uint16_t dm9051_link_show(void);
 
-#define DM9051_FLAG_LINK_UP				0x01U
+#define DM9051_FLAG_LINK_UP							0x01U
 
-#define dm9051_set_flags(flg, set_flags)     do { flg = (u8)(flg | (set_flags)); } while(0)
-#define dm9051_clear_flags(flg, clr_flags)   do { flg = (u8)(flg & (u8)(~(clr_flags) & 0xff)); } while(0)
-#define dm9051_is_flag_set(flg, flag)        ((flg & (flag)) != 0)
+#define dm9051_set_flags(flg, set_flags)     		do { flg = (u8)(flg | (set_flags)); } while(0)
+#define dm9051_clear_flags(flg, clr_flags)   		do { flg = (u8)(flg & (u8)(~(clr_flags) & 0xff)); } while(0)
+#define dm9051_is_flag_set(flg, flag)        		((flg & (flag)) != 0)
 
-#define chipid_on_pin_code_log_s(str, fstr)	printf("...%s...          Read Chip ID: %02x\r\n", fstr, id)
-#define chipid_on_pin_code_log_err(str)	printf(":  %s, Read Chip ID error!\r\n", str)
+#define chipid_on_pin_code_log_s(str, fstr, id)		printf("...%s...          %s Read Chip ID OK: %02x (this CS_EACH_MODE)\r\n", fstr, str, id)
+#define chipid_on_pin_code_log_err(str, fstr, id)	printf("...%s...          %s Read Chip ID error: %02x (this CS_EACH_MODE)\r\n", fstr, str, id)
 
-void display_verify_chipid(char *str, char *spiname, uint16_t id);
+#define display_ids(fstr, ids)						printf("...%s...          chip ids: %02x %02x %02x %02x %02x (this %s)\r\n", \
+															fstr, ids[0], ids[1], ids[2], ids[3], ids[4], dm9051opts_desccsmode())
+#define display_ida(fstr, id_adv)					printf("...%s...          chip rev: %02x\r\n", fstr, id_adv)
+
+int display_identity(char *spiname, uint16_t id, uint8_t *ids, uint8_t id_adv);
+int display_verify_chipid(char *str, char *spiname, uint16_t id);
+void display_chipmac(void);
 
 /*
  * export open functions

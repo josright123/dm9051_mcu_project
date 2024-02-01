@@ -51,7 +51,7 @@ uint16_t testproc_drv_initialize(void)
     dm_delay_ms(1);
     // id =
     id = dm9051_init(addr_meanless);
-    dm9051_board_irq_enable();
+//    dm9051_board_irq_enable();
     dm9051_start(addr_meanless);
     // display_verify_chipid("dm9051_init", mstep_spi_conf_name(), id);
   }
@@ -83,7 +83,7 @@ void testproc_net_test(void)
   //
   // JJ.Test Multi-SPI.
   //
-  bench_test_tx_and_rx(); // test_ethernetif_txrx();
+//  bench_test_tx_and_rx(); // test_ethernetif_txrx();
   printf(": test end\r\n");
   // printf(": while(1);\r\n");
 #elif (ETHERNET_COUNT == 1)
@@ -682,12 +682,12 @@ void testproc_run(void)
   }
 }
 
-void testproc_board_initialize(void)
-{
-  printf("\r\n");
-  printf("- dm9051_board_initialize [%d spi board(s), 'devconf' as %s]\r\n", mstep_conf_spi_count(), mstep_conf_type());
-  printf("- dm9051_board_initialize [%d eth device(s)]\r\n", ETHERNET_COUNT);
-  printf("\r\n");
-  dm9051_board_initialize(); // netif_create(&ethernetif_create); //at32_dm9051_init_configuration_all(); //env_dm9051f_system_init();
-  printf("\r\n");
-}
+//void testproc_board_initialize(void)
+//{
+//  printf("\r\n");
+//  printf("- dm9051_board_initialize [%d spi board(s), 'devconf' as %s]\r\n", mstep_conf_spi_count(), mstep_conf_type());
+//  printf("- dm9051_board_initialize [%d eth device(s)]\r\n", ETHERNET_COUNT);
+//  printf("\r\n");
+//  dm9051_board_initialize(); // netif_create(&ethernetif_create); //at32_dm9051_init_configuration_all(); //env_dm9051f_system_init();
+//  printf("\r\n");
+//}

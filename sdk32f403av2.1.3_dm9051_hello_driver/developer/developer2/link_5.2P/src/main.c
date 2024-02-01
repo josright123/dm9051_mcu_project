@@ -43,6 +43,25 @@
 // usart3proc_fun.h
 #include "usart3proc/usart3proc_fun.h"
 
+void title(char *appname) {
+  bannerline_log();
+  bannerline_log();
+  printf("%s start: [BOARD_SPI COUNT] %d  /  Operating: [ETHERNET COUNT] %d\r\n", appname, BOARD_SPI_COUNT, ETHERNET_COUNT);
+}
+
+//void ethernets_init(void) {
+//  int i;
+//  for (i = 0; i < ETHERNET_COUNT; i++) {
+//	mstep_set_net_index(i); //+
+//	dm9051_init(mstep_eth_mac());
+//  }
+//}
+
+void drviver_init(void) {
+	dm9051_init(mstep_eth_mac());
+	//.display_chipmac();
+}
+
 /**
  * @brief  main function.
  * @param  none
@@ -54,23 +73,44 @@ int main(void)
   system_clock_config();
   at32_board_init(); 
   uart_print_init(115200);
-  usart3_configuration();    
+	
+	
+  title("hello_driver");
+  //GpioDisplay();
+  //ethcnt_ifdiplay_iomode();
 
-  testproc_board_initialize(); // dm9051_board_initialize
-  id = testproc_drv_initialize();
+//#if 0
+//  dm9051_boards_initialize(); //of-1.12
+//  ethernet_interfaces_initialize(); //of-1.12
+//#endif
+#if 1
+  dm9051_boards_initialize(); //of-1.12
+  TRANS_CONN(drviver_init, ENUM_TRANS); //ethernets_init();
+#endif
+	
+  while(1) {
+    delay_sec(1);
+    //printf("usart printf counter: %u\r\n",time_cnt++);
+  }	
+	
+	
+//  usart3_configuration();    
 
-  printf(": test start...\r\n");
-  
-  if (id != (DM9051_ID >> 16))
-  {
-    printf("Chip ID wrong! Check the device board!\r\n");
-    printf(": test end\r\n");
-    printf(": while(1);\r\n");
-    while (1)
-      ;
-  }
-  testproc_net_test();
-  testproc_run();
+//  testproc_board_initialize(); // dm9051_board_initialize
+//  id = testproc_drv_initialize();
+
+//  printf(": test start...\r\n");
+//  
+//  if (id != (DM9051_ID >> 16))
+//  {
+//    printf("Chip ID wrong! Check the device board!\r\n");
+//    printf(": test end\r\n");
+//    printf(": while(1);\r\n");
+//    while (1)
+//      ;
+//  }
+//  testproc_net_test();
+//  testproc_run();
 }
 
 /**
