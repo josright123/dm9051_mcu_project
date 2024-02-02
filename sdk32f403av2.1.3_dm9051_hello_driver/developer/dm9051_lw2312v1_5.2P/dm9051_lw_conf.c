@@ -215,9 +215,10 @@ void dm_delay_ms(uint16_t nms) {
   */
 static void spi_add(void) //=== pins_config(); //total_eth_count++;
 {
-  gpio_pin_config(&gpio_wire_sck(), GPIO_PULL_NONE); //,GPIO_MODE_MUX
-  gpio_pin_config(&gpio_wire_mi(), GPIO_PULL_NONE); //,GPIO_MODE_MUX
-  gpio_pin_config(&gpio_wire_mo(), GPIO_PULL_NONE); //,GPIO_MODE_MUX //GPIO_PULL_UP; //test ffff
+	gpio_pin_config(&gpio_wire_sck(), (spi_number() == SPI1) ? GPIO_PULL_DOWN : GPIO_PULL_NONE); //,GPIO_MODE_MUX
+	
+  gpio_pin_config(&gpio_wire_mi(), (spi_number() == SPI1) ? GPIO_PULL_UP : GPIO_PULL_NONE); //,GPIO_MODE_MUX
+  gpio_pin_config(&gpio_wire_mo(), (spi_number() == SPI1) ? GPIO_PULL_UP : GPIO_PULL_NONE); //,GPIO_MODE_MUX //GPIO_PULL_UP; //test ffff
   spi_config(); //(spi_port_ptr(_pinCode));
   gpio_pin_config(&gpio_cs(), GPIO_PULL_NONE); //,GPIO_MODE_OUTPUT
 }
@@ -247,6 +248,17 @@ int dm9051_boards_initialize(void)
 	//		mac_addresse[mstep_get_net_index()][3],
 	//		mac_addresse[mstep_get_net_index()][4],
 	//		mac_addresse[mstep_get_net_index()][5]);
+		
+	if (spi_number() == SPI1) {
+		crm_periph_clock_enable(CRM_IOMUX_PERIPH_CLOCK, TRUE);
+//#define SWJTAG_MUX_001                   SWJTAG_GMUX_001   /*!< full swj enabled  (jtag-dp  +  sw-dp)  but without jtrst */
+//#define SWJTAG_MUX_010                   SWJTAG_GMUX_010   /*!< jtag-dp disabled and sw-dp enabled */
+//#define SWJTAG_MUX_100                   SWJTAG_GMUX_100   /*!< full swj disabled  (jtag-dp  +  sw-dp) */
+		gpio_pin_remap_config(SWJTAG_MUX_010, TRUE);
+		//gpio_pin_remap_config(SWJTAG_MUX_100, TRUE);
+		
+		gpio_pin_remap_config(SPI1_MUX_10, TRUE);
+	}
 	
 	spi_add();
 	rst_add();

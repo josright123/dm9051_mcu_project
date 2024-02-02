@@ -451,6 +451,11 @@
               <FileType>1</FileType>
               <FilePath>..\src\dm9051a\dm9051a_eep.c</FilePath>
             </File>
+            <File>
+              <FileName>dm9051opts.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\dm9051_lw2312v1_5.2P\dm9051opts.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -531,11 +536,6 @@
         <Group>
           <GroupName>usr_1</GroupName>
           <Files>
-            <File>
-              <FileName>dm9051_lw_testproc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\testproc\dm9051_lw_testproc.c</FilePath>
-            </File>
             <File>
               <FileName>testproc_main.c</FileName>
               <FileType>1</FileType>
