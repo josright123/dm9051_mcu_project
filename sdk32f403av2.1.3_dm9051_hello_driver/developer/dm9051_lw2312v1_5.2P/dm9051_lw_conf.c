@@ -254,8 +254,9 @@ int dm9051_boards_initialize(void)
 //#define SWJTAG_MUX_001                   SWJTAG_GMUX_001   /*!< full swj enabled  (jtag-dp  +  sw-dp)  but without jtrst */
 //#define SWJTAG_MUX_010                   SWJTAG_GMUX_010   /*!< jtag-dp disabled and sw-dp enabled */
 //#define SWJTAG_MUX_100                   SWJTAG_GMUX_100   /*!< full swj disabled  (jtag-dp  +  sw-dp) */
+//		gpio_pin_remap_config(SWJTAG_GMUX_001, TRUE);		
 		gpio_pin_remap_config(SWJTAG_MUX_010, TRUE);
-		//gpio_pin_remap_config(SWJTAG_MUX_100, TRUE);
+		//gpio_pin_remap_config(SWJTAG_MUX_100, TRUE); xxx
 		
 		gpio_pin_remap_config(SPI1_MUX_10, TRUE);
 	}
