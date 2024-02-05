@@ -260,10 +260,10 @@ void exint_add(void)
 int dm9051_boards_initialize(void)
 {
 	int i;
-	// For SPI1 use
-	crm_periph_clock_enable(CRM_IOMUX_PERIPH_CLOCK, TRUE);
-	/*!< jtag-dp disabled and sw-dp enabled */
-	gpio_pin_remap_config(SWJTAG_MUX_010, TRUE);
+	// // For SPI1 use
+	// crm_periph_clock_enable(CRM_IOMUX_PERIPH_CLOCK, TRUE);
+	// /*!< jtag-dp disabled and sw-dp enabled */
+	// // gpio_pin_remap_config(SWJTAG_MUX_010, TRUE);
 	// gpio_pin_remap_config(SPI1_MUX_10, TRUE);
 
 	for (i = 0; i < ETHERNET_COUNT; i++)
