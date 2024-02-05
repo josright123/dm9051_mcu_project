@@ -1,0 +1,26 @@
+dm9051_lw version 3.0, 20240119. Joseph CHANG.
+dm9051_lw version 3.1, 20240119. Joseph CHANG.
+dm9051_lw version 3.11, 20240120. Joseph CHANG.
+		  Using APIs:
+			display:
+			  ethcnt_ifdiplay_iomode() //attributes
+			control:
+			  dm9051_board_initialize()
+			  dm9051_init(macaddr)
+			-- TEST_PLAN_MODE 1/ HELLO_DRIVER_API 1/ HELLO_DRIVER_OPTS_DISPLAY_API 0/ HELLO_DRIVER_INTERNAL 1
+
+dm9051_lw version 3.12, 20240123. Joseph CHANG. (Hello driver verification)
+		  Using APIs:
+			control:
+			  dm9051_board_initialize()
+			  ethernet_interfaces_initialize()
+			-- TEST_PLAN_MODE 0/ HELLO_DRIVER_API 1/ HELLO_DRIVER_OPTS_DISPLAY_API 1/ HELLO_DRIVER_INTERNAL 1
+
+--------------------
+Options description:
+-------------------- 
+	TEST_PLAN_MODE, to be checked whether disable can be ok
+	HELLO_DRIVER_API, a driver essential api (enable for an app plan to use this driver)
+	HELLO_DRIVER_OPTS_DISPLAY_API, some opts info display (disable is possible)
+	HELLO_DRIVER_INTERNAL, a driver essential api (Compiler only with header files, disable to test)
+	
